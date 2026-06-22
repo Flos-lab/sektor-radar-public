@@ -1,0 +1,56 @@
+[
+  {
+    "date": "2026-06-18",
+    "sector": "Finanzen",
+    "topPick": {
+      "ticker": "V",
+      "name": "Visa",
+      "reason": "Höchste Rule of 40 (68%) im Peer-Set, 5/5-Burggraben durch globales Zahlungsnetzwerk mit 4,9 Mrd. Karten — strukturell unmöglich zu replizieren, keine Risikoflags.",
+      "priceAtPick": 295,
+      "currentPrice": 327
+    },
+    "allFive": [
+      "BX",
+      "MA",
+      "MCO",
+      "SPGI",
+      "V"
+    ]
+  },
+  {
+    "date": "2026-06-19",
+    "sector": "Health",
+    "topPick": {
+      "ticker": "LLY",
+      "name": "Eli Lilly",
+      "reason": "Q1 2026 +56% Umsatzwachstum auf $19,8 Mrd., Mounjaro +125%, Foundayo (orales GLP-1) April 2026 FDA-zugelassen, 60% US-GLP-1-Marktanteil — stärkste Wachstumsstory unter Mega-Cap-Pharma ohne Risikoflags.",
+      "priceAtPick": 1098,
+      "currentPrice": 1098
+    },
+    "allFive": [
+      "ABBV",
+      "ISRG",
+      "LLY",
+      "REGN",
+      "VRTX"
+    ]
+  },
+  {
+    "date": "2026-06-22",
+    "sector": "Tech",
+    "topPick": {
+      "ticker": "NVDA",
+      "name": "Nvidia",
+      "reason": "Q1 FY27 Rekord: $81,6 Mrd. Umsatz (+85% YoY), Data Center $75,2 Mrd. (+92%), Q2 FY27 Guidance $91 Mrd. Morningstar Fair Value $280 vs. aktuell $209 (+34%). CUDA-Moat seit 15 Jahren unangetastet — stärkster Burggraben im gesamten Tech-Sektor.",
+      "priceAtPick": 209,
+      "currentPrice": 210
+    },
+    "allFive": [
+      "NVDA",
+      "AVGO",
+      "MSFT",
+      "META",
+      "GOOGL"
+    ]
+  }
+]

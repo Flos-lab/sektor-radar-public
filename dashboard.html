@@ -1,2 +1,2780 @@
 <!DOCTYPE html>
-<html><body><p>Platzhalter – wird durch die Routine ersetzt.</p></body></html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aktien Dashboard – Finanzanalyse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #f4f6fb;
+      --surface:     #ffffff;
+      --surface-2:   #f0f2f8;
+      --border:      #e2e6f0;
+      --text:        #111827;
+      --text-muted:  #6b7280;
+      --text-light:  #9ca3af;
+      --primary:     #4f46e5;
+      --primary-light: #ede9fe;
+      --green:       #10b981;
+      --green-bg:    #d1fae5;
+      --amber:       #f59e0b;
+      --amber-bg:    #fef3c7;
+      --red:         #ef4444;
+      --red-bg:      #fee2e2;
+      --blue:        #3b82f6;
+      --blue-bg:     #dbeafe;
+      --shadow-sm:   0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow:      0 4px 16px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+      --shadow-lg:   0 20px 60px rgba(0,0,0,.15), 0 4px 16px rgba(0,0,0,.08);
+      --radius:      14px;
+      --radius-sm:   8px;
+      --mono:        'DM Mono', monospace;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── NAV ─────────────────────────────────────── */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .nav-inner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 24px; max-width: 1200px; margin: 0 auto;
+    }
+    .nav-logo {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--primary); display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+    }
+    .nav-logo svg { width: 18px; height: 18px; fill: white; }
+    .nav-title { font-weight: 700; font-size: 15px; color: var(--text); }
+    .nav-badge {
+      margin-left: auto; font-size: 11px; font-weight: 600;
+      color: var(--text-muted); background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 6px; padding: 3px 10px;
+      font-family: var(--mono);
+    }
+
+    /* ── TABS ────────────────────────────────────── */
+    .nav-tabs {
+      display: flex; gap: 0; margin-left: 24px;
+    }
+    .nav-tab {
+      padding: 15px 20px; font-size: 13px; font-weight: 600;
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); position: relative;
+      transition: color .15s; white-space: nowrap;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active { color: var(--primary); }
+    .nav-tab.active::after {
+      content: ''; position: absolute; bottom: 0; left: 20px; right: 20px;
+      height: 2px; background: var(--primary); border-radius: 2px;
+    }
+    @media (max-width: 768px) {
+      .nav-tabs { margin-left: 8px; }
+      .nav-tab { padding: 15px 12px; font-size: 12px; }
+      .nav-tab.active::after { left: 12px; right: 12px; }
+    }
+
+    /* ── HERO ─────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #6366f1 50%, #8b5cf6 100%);
+      color: white; padding: 56px 24px 48px;
+    }
+    .hero-ai {
+      background: linear-gradient(135deg, #059669 0%, #10b981 40%, #3b82f6 100%);
+    }
+    .hero-inner { max-width: 1200px; margin: 0 auto; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+      border-radius: 100px; padding: 4px 14px; font-size: 12px;
+      font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: #a5f3fc; }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 44px); font-weight: 800; line-height: 1.15;
+      margin-bottom: 14px; max-width: 620px;
+    }
+    .hero-sub { font-size: 16px; opacity: .8; max-width: 520px; margin-bottom: 36px; }
+    .hero-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+    .hero-stat-val { font-size: 26px; font-weight: 800; line-height: 1; font-family: var(--mono); }
+    .hero-stat-label { font-size: 12px; opacity: .7; margin-top: 4px; }
+
+    /* ── SECTION ─────────────────────────────────── */
+    section { padding: 40px 0; }
+    .section-header { margin-bottom: 24px; }
+    .section-title { font-size: 20px; font-weight: 700; }
+    .section-desc { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── HELP BOX ────────────────────────────────── */
+    .help-box {
+      background: var(--primary-light); border: 1px solid #c4b5fd;
+      border-radius: var(--radius); padding: 18px 22px; margin-bottom: 32px;
+    }
+    .help-box p { font-size: 13.5px; color: #3730a3; line-height: 1.7; }
+    .help-box strong { color: #312e81; }
+
+    /* ── TABLE ───────────────────────────────────── */
+    .compare-card {
+      background: var(--surface); border-radius: var(--radius);
+      border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: var(--surface-2); }
+    th {
+      padding: 12px 18px; text-align: left; font-size: 11px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+      color: var(--text-muted); white-space: nowrap;
+    }
+    th:first-child { width: 200px; }
+    td { padding: 14px 18px; font-size: 14px; border-top: 1px solid var(--border); vertical-align: middle; }
+    tbody tr { transition: background .15s; cursor: pointer; }
+    tbody tr:hover { background: var(--surface-2); }
+    .ticker-cell { display: flex; align-items: center; gap: 10px; }
+    .ticker-dot {
+      width: 36px; height: 36px; border-radius: 10px; display: flex;
+      align-items: center; justify-content: center; font-family: var(--mono);
+      font-size: 11px; font-weight: 500; flex-shrink: 0;
+    }
+    .stock-name { font-weight: 600; font-size: 14px; }
+    .stock-ticker { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+    .num { font-family: var(--mono); font-size: 13px; }
+    .badge {
+      display: inline-block; border-radius: 6px; padding: 3px 10px;
+      font-size: 12px; font-weight: 600; font-family: var(--mono);
+    }
+    .badge-green { background: var(--green-bg); color: #065f46; }
+    .badge-amber { background: var(--amber-bg); color: #92400e; }
+    .badge-red   { background: var(--red-bg);   color: #991b1b; }
+    .badge-blue  { background: var(--blue-bg);  color: #1e40af; }
+
+    /* ── STARS ───────────────────────────────────── */
+    .stars { display: flex; gap: 2px; align-items: center; }
+    .star { font-size: 14px; }
+    .star.filled { color: var(--amber); }
+    .star.empty  { color: var(--border); }
+
+    /* ── STOCK CARDS ─────────────────────────────── */
+    .cards-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;
+    }
+    .stock-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow-sm);
+      overflow: hidden; transition: transform .2s, box-shadow .2s;
+      cursor: pointer;
+    }
+    .stock-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .stock-card:hover .card-click-hint { opacity: 1; }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 22px 16px; border-bottom: 1px solid var(--border);
+    }
+    .card-title-group { display: flex; align-items: center; gap: 12px; }
+    .card-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 13px; font-weight: 500;
+    }
+    .card-name { font-size: 16px; font-weight: 700; }
+    .card-full-name { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .verdict-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      border-radius: 100px; padding: 5px 13px; font-size: 12px; font-weight: 600;
+    }
+    .verdict-badge-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .card-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; }
+    .metric-row { display: flex; flex-direction: column; gap: 5px; }
+    .metric-label-row { display: flex; justify-content: space-between; align-items: center; }
+    .metric-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+    .metric-value { font-size: 13px; font-weight: 600; font-family: var(--mono); }
+    .metric-hint { font-size: 11.5px; color: var(--text-muted); }
+    .bar-track { height: 6px; background: var(--surface-2); border-radius: 100px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 100px; }
+    .card-divider { height: 1px; background: var(--border); margin: 2px 0; }
+    .outlook-row { display: flex; gap: 10px; }
+    .outlook-box { flex: 1; border-radius: var(--radius-sm); padding: 10px 12px; }
+    .outlook-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .outlook-text { font-size: 12px; line-height: 1.5; }
+    .outlook-bull { background: var(--green-bg); }
+    .outlook-bull .outlook-label { color: #065f46; }
+    .outlook-bull .outlook-text { color: #064e3b; }
+    .outlook-bear { background: var(--red-bg); }
+    .outlook-bear .outlook-label { color: #991b1b; }
+    .outlook-bear .outlook-text { color: #7f1d1d; }
+    .card-click-hint {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 10px; border-top: 1px solid var(--border);
+      font-size: 12px; color: var(--primary); font-weight: 600;
+      opacity: 0; transition: opacity .2s; background: var(--primary-light);
+    }
+
+    /* ── CHART ───────────────────────────────────── */
+    .chart-card {
+      background: var(--surface); border-radius: var(--radius);
+      border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+      padding: 28px; display: grid; grid-template-columns: 1fr 320px; gap: 32px; align-items: center;
+    }
+    .chart-wrapper { position: relative; height: 340px; }
+    .chart-legend { display: flex; flex-direction: column; gap: 10px; }
+    .chart-legend-item { display: flex; align-items: flex-start; gap: 10px; }
+    .legend-swatch { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; margin-top: 3px; }
+    .legend-name { font-size: 13px; font-weight: 600; }
+    .legend-desc { font-size: 11.5px; color: var(--text-muted); }
+    .chart-axes-legend { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .chart-axes-legend p { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+
+    /* ── DISCLAIMER ──────────────────────────────── */
+    .disclaimer {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 24px; margin: 8px 0 40px;
+    }
+    .disclaimer p { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+    .disclaimer-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-light); margin-bottom: 8px; }
+
+    /* ── MARKET TILES ────────────────────────────── */
+    .market-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .market-tile {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow-sm);
+    }
+    .market-tile-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+    .market-tile-val { font-size: 22px; font-weight: 800; font-family: var(--mono); }
+    .market-tile-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ═══════════════════════════════════════════════
+       DRAWER
+    ═══════════════════════════════════════════════ */
+    .backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,.4);
+      backdrop-filter: blur(2px); z-index: 100;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s ease;
+    }
+    .backdrop.open { opacity: 1; pointer-events: all; }
+
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: min(580px, 95vw);
+      background: var(--surface);
+      box-shadow: var(--shadow-lg);
+      z-index: 101;
+      transform: translateX(100%);
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .drawer.open { transform: translateX(0); }
+
+    .drawer-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .drawer-title-group { display: flex; align-items: center; gap: 14px; }
+    .drawer-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 14px; font-weight: 600;
+    }
+    .drawer-name { font-size: 20px; font-weight: 800; }
+    .drawer-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .drawer-close {
+      width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--surface-2); cursor: pointer; font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); transition: background .15s;
+      flex-shrink: 0;
+    }
+    .drawer-close:hover { background: var(--border); }
+
+    .drawer-body {
+      flex: 1; overflow-y: auto; padding: 24px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .drawer-body::-webkit-scrollbar { width: 6px; }
+    .drawer-body::-webkit-scrollbar-track { background: transparent; }
+    .drawer-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* Drawer sections */
+    .d-section { display: flex; flex-direction: column; gap: 12px; }
+    .d-section-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--text-light);
+      padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    }
+
+    /* KPI grid */
+    .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .kpi-box {
+      background: var(--surface-2); border-radius: var(--radius-sm);
+      padding: 12px 14px;
+    }
+    .kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+    .kpi-val { font-size: 18px; font-weight: 800; font-family: var(--mono); }
+    .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Moat dots */
+    .moat-row { display: flex; flex-direction: column; gap: 8px; }
+    .moat-item { display: flex; align-items: center; justify-content: space-between; }
+    .moat-name { font-size: 13px; font-weight: 500; }
+    .moat-dots { display: flex; gap: 4px; }
+    .moat-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+    .moat-dot.on { background: var(--amber); }
+    .moat-explain { font-size: 11px; color: var(--text-muted); margin-top: -4px; }
+
+    /* Scenario bars */
+    .scenario-row { display: flex; gap: 8px; }
+    .scenario-box {
+      flex: 1; border-radius: var(--radius-sm); padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .scenario-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+    .scenario-pct { font-size: 20px; font-weight: 800; font-family: var(--mono); }
+    .scenario-text { font-size: 11.5px; line-height: 1.5; }
+    .scenario-bull { background: #d1fae5; }
+    .scenario-bull .scenario-label { color: #065f46; }
+    .scenario-bull .scenario-pct { color: #065f46; }
+    .scenario-bull .scenario-text { color: #064e3b; }
+    .scenario-base { background: var(--blue-bg); }
+    .scenario-base .scenario-label { color: #1e40af; }
+    .scenario-base .scenario-pct { color: #1e40af; }
+    .scenario-base .scenario-text { color: #1e3a8a; }
+    .scenario-bear { background: var(--red-bg); }
+    .scenario-bear .scenario-label { color: #991b1b; }
+    .scenario-bear .scenario-pct { color: #991b1b; }
+    .scenario-bear .scenario-text { color: #7f1d1d; }
+
+    /* Summary box */
+    .summary-box {
+      border-radius: var(--radius); padding: 20px 22px;
+      border-left: 4px solid;
+    }
+    .summary-headline {
+      font-size: 15px; font-weight: 800; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .summary-text { font-size: 14px; line-height: 1.75; }
+    .summary-note {
+      font-size: 11px; margin-top: 12px; padding-top: 10px;
+      border-top: 1px solid rgba(0,0,0,.08); color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .cards-grid { grid-template-columns: 1fr; }
+      .market-row { grid-template-columns: 1fr 1fr; }
+      .chart-card { grid-template-columns: 1fr; }
+      .hero-stats { gap: 20px; }
+      .kpi-grid { grid-template-columns: 1fr; }
+      .scenario-row { flex-direction: column; }
+      .toolbox-grid { grid-template-columns: 1fr; }
+      .step-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── WORKFLOW PAGE ─────────────────────────── */
+    .workflow-container { display: flex; flex-direction: column; gap: 40px; }
+
+    .toolbox-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    }
+    .toolbox-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px 24px; box-shadow: var(--shadow-sm);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .toolbox-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .toolbox-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 16px;
+    }
+    .toolbox-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .toolbox-desc { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
+    .toolbox-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+
+    .step-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    }
+    .step-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm);
+      display: flex; flex-direction: column; gap: 14px;
+      transition: transform .2s, box-shadow .2s; position: relative;
+    }
+    .step-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .step-header { display: flex; align-items: center; gap: 14px; }
+    .step-number {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; font-family: var(--mono);
+      color: white;
+    }
+    .step-title { font-size: 15px; font-weight: 700; line-height: 1.3; }
+    .step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; flex: 1; }
+    .step-skills { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    .skill-tag {
+      display: inline-block; font-family: var(--mono); font-size: 11px;
+      font-weight: 500; padding: 3px 9px; border-radius: 5px;
+      white-space: nowrap;
+    }
+    .skill-tag.er { background: #ede9fe; color: #5b21b6; }
+    .skill-tag.fa { background: #dbeafe; color: #1e40af; }
+    .skill-tag.mr { background: #fef3c7; color: #92400e; }
+
+    .skills-table-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .skills-table { width: 100%; border-collapse: collapse; }
+    .skills-table thead tr { background: var(--surface-2); }
+    .skills-table th {
+      padding: 12px 18px; text-align: left; font-size: 11px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+      color: var(--text-muted);
+    }
+    .skills-table td {
+      padding: 12px 18px; font-size: 13px; border-top: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .skills-table td:first-child { font-family: var(--mono); font-size: 12px; font-weight: 500; }
+    .skills-table td:last-child { color: var(--text-muted); }
+    .skills-table tbody tr { transition: background .15s; }
+    .skills-table tbody tr:hover { background: var(--surface-2); }
+
+    /* ── DCF BADGE ───────────────────────────────── */
+    .dcf-banner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; border-radius: var(--radius-sm); padding: 10px 14px;
+      margin-top: 2px;
+    }
+    .dcf-banner.sell { background: var(--red-bg); }
+    .dcf-banner.buy  { background: var(--green-bg); }
+    .dcf-banner.hold { background: var(--amber-bg); }
+    .dcf-banner.none { background: var(--surface-2); }
+    .dcf-rec {
+      font-size: 12px; font-weight: 700; font-family: var(--mono);
+      letter-spacing: .04em;
+    }
+    .dcf-banner.sell .dcf-rec { color: #991b1b; }
+    .dcf-banner.buy  .dcf-rec { color: #065f46; }
+    .dcf-banner.hold .dcf-rec { color: #92400e; }
+    .dcf-banner.none .dcf-rec { color: var(--text-muted); }
+    .dcf-detail { font-size: 12px; font-family: var(--mono); }
+    .dcf-banner.sell .dcf-detail { color: #7f1d1d; }
+    .dcf-banner.buy  .dcf-detail { color: #064e3b; }
+    .dcf-banner.hold .dcf-detail { color: #78350f; }
+    .dcf-banner.none .dcf-detail { color: var(--text-muted); }
+
+    /* DCF Drawer section */
+    .dcf-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .dcf-box {
+      border-radius: var(--radius-sm); padding: 10px 12px;
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .dcf-box-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+    .dcf-box-val   { font-size: 18px; font-weight: 800; font-family: var(--mono); }
+    .dcf-box-sub   { font-size: 11px; }
+    .dcf-box.bear  { background: #fee2e2; }
+    .dcf-box.bear .dcf-box-label, .dcf-box.bear .dcf-box-sub { color: #991b1b; }
+    .dcf-box.bear .dcf-box-val { color: #991b1b; }
+    .dcf-box.base  { background: var(--blue-bg); }
+    .dcf-box.base .dcf-box-label, .dcf-box.base .dcf-box-sub { color: #1e40af; }
+    .dcf-box.base .dcf-box-val { color: #1e40af; }
+    .dcf-box.bull  { background: #d1fae5; }
+    .dcf-box.bull .dcf-box-label, .dcf-box.bull .dcf-box-sub { color: #065f46; }
+    .dcf-box.bull .dcf-box-val { color: #065f46; }
+    .dcf-disclaimer { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- BACKDROP -->
+<div class="backdrop" id="backdrop" onclick="closeDrawer()"></div>
+
+<!-- DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-title-group">
+      <div class="drawer-icon" id="drawerIcon"></div>
+      <div>
+        <div class="drawer-name" id="drawerName"></div>
+        <div class="drawer-sub" id="drawerSub"></div>
+      </div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Schließen">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <svg viewBox="0 0 20 20"><path d="M2 11l8-9 8 9H16v7H4v-7z"/></svg>
+    </div>
+    <span class="nav-title">Aktien Dashboard</span>
+    <div class="nav-tabs" id="navTabs">
+      <button class="nav-tab" data-sector="weekly" onclick="switchPage('weekly')">Wochenrückblick</button>
+      <button class="nav-tab active" data-sector="health" onclick="switchPage('health')">Health</button>
+      <button class="nav-tab" data-sector="tech" onclick="switchPage('tech')">Tech</button>
+      <button class="nav-tab" data-sector="energie" onclick="switchPage('energie')">Energie</button>
+      <button class="nav-tab" data-sector="finanzen" onclick="switchPage('finanzen')">Finanzen</button>
+      <button class="nav-tab" data-sector="performance" onclick="switchPage('performance')">Performance</button>
+      <button class="nav-tab" data-sector="workflow" onclick="switchPage('workflow')">Workflow</button>
+    </div>
+    <span class="nav-badge" id="navBadge">Stand: 19. Juni 2026</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="heroSection">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      <span id="heroEyebrow">Sektor: Tech</span>
+    </div>
+    <h1 id="heroTitle">Welche Aktie könnte<br/>interessant sein?</h1>
+    <p class="hero-sub" id="heroSub">
+      Eine verständliche Übersicht der 5 größten Tech-Unternehmen an der Börse —
+      aufbereitet für Einsteiger ohne Finanzwissen.
+    </p>
+    <div class="hero-stats" id="heroStats"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <div id="sectorContent">
+
+  <section style="padding-bottom:0">
+    <div class="help-box" id="helpBox">
+      <p>
+        <strong>Wie lese ich dieses Dashboard?</strong> Jede Aktie wird mit einfachen Kennzahlen bewertet.
+        Du siehst, ob eine Aktie gerade <strong>günstig</strong> oder <strong>teuer</strong> ist, wie schnell das Unternehmen wächst
+        und wie stark der Vorteil gegenüber Konkurrenten ist. Grün = positiv, Gelb = mittel, Rot = Vorsicht.
+        <strong>Klicke auf eine Aktie</strong> für eine ausführliche Erklärung — inkl. einer einfachen Zusammenfassung.
+      </p>
+    </div>
+  </section>
+
+  <!-- MARKET TILES -->
+  <section>
+    <div class="section-header">
+      <div class="section-title" id="marketTitle">Der Markt auf einen Blick</div>
+      <div class="section-desc" id="marketDesc">Warum Cybersecurity als Sektor interessant ist</div>
+    </div>
+    <div class="market-row" id="marketTiles"></div>
+  </section>
+
+  <!-- QUICK COMPARE TABLE -->
+  <section>
+    <div class="section-header">
+      <div class="section-title">Schnellvergleich aller Aktien</div>
+      <div class="section-desc">Klicke auf eine Zeile für die vollständige Analyse</div>
+    </div>
+    <div class="compare-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Unternehmen</th>
+            <th>Wachstum</th>
+            <th>Unternehmensgröße</th>
+            <th>Preis der Aktie</th>
+            <th>Effizienz</th>
+            <th>Wettb.-vorteil</th>
+            <th>Einschätzung</th>
+          </tr>
+        </thead>
+        <tbody id="compareBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- STOCK CARDS -->
+  <section>
+    <div class="section-header">
+      <div class="section-title">Detailansicht: Jede Aktie im Einzelnen</div>
+      <div class="section-desc">Klicke auf eine Karte für die vollständige Analyse mit einfacher Zusammenfassung</div>
+    </div>
+    <div class="cards-grid" id="cardsGrid"></div>
+  </section>
+
+  <!-- RADAR CHART -->
+  <section>
+    <div class="section-header">
+      <div class="section-title">Visueller Vergleich</div>
+      <div class="section-desc">Wie gut schneidet jede Aktie in den wichtigsten Bereichen ab?</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-wrapper">
+        <canvas id="radarChart"></canvas>
+      </div>
+      <div>
+        <div class="chart-legend" id="chartLegend"></div>
+        <div class="chart-axes-legend">
+          <p><strong>Was zeigt das Diagramm?</strong></p>
+          <p style="margin-bottom:8px">Je weiter außen, desto besser. Ein gleichmäßiges Fünfeck wäre ideal.</p>
+          <p><strong>Wachstum</strong> — Umsatzzuwachs pro Jahr</p>
+          <p><strong>Effizienz</strong> — Wächst es auch profitabel?</p>
+          <p><strong>Marge</strong> — Was bleibt nach Kosten übrig?</p>
+          <p><strong>Bewertung</strong> — Günstig = gut (umgekehrte Skala)</p>
+          <p><strong>Burggraben</strong> — Vorteil gegenüber Konkurrenz</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /sectorContent -->
+
+  <!-- ═══════════════════════════════════════════════════════
+       WORKFLOW PAGE
+  ═══════════════════════════════════════════════════════ -->
+  <div id="workflowContent" style="display:none">
+
+    <!-- TOOLBOX OVERVIEW -->
+    <section>
+      <div class="section-header">
+        <div class="section-title">Das Financial-Services-Plugin</div>
+        <div class="section-desc">Drei Werkzeugk&auml;sten f&uuml;r die Aktienanalyse &mdash; du brauchst nur eine Handvoll davon</div>
+      </div>
+      <div class="toolbox-grid">
+        <div class="toolbox-card">
+          <div class="toolbox-icon" style="background:#ede9fe;color:#5b21b6">&#128270;</div>
+          <div class="toolbox-name">equity-research</div>
+          <div class="toolbox-desc">
+            Recherche-Werkzeuge: Sektor verstehen, Aktien-Ideen finden, Firmen tief analysieren, Investment-These dokumentieren.
+          </div>
+          <div class="toolbox-skills">
+            <span class="skill-tag er">/equity-research:sector</span>
+            <span class="skill-tag er">/equity-research:screen</span>
+            <span class="skill-tag er">/equity-research:initiate</span>
+            <span class="skill-tag er">/equity-research:thesis</span>
+          </div>
+        </div>
+        <div class="toolbox-card">
+          <div class="toolbox-icon" style="background:#dbeafe;color:#1e40af">&#128200;</div>
+          <div class="toolbox-name">financial-analysis</div>
+          <div class="toolbox-desc">
+            Rechen-Werkzeuge: Firmen vergleichen (Bewertung), fairen Wert einer Aktie sch&auml;tzen, Excel-Modelle bauen und pr&uuml;fen.
+          </div>
+          <div class="toolbox-skills">
+            <span class="skill-tag fa">/financial-analysis:competitive-analysis</span>
+            <span class="skill-tag fa">/financial-analysis:comps</span>
+            <span class="skill-tag fa">/financial-analysis:dcf</span>
+            <span class="skill-tag fa">/financial-analysis:audit-xls</span>
+          </div>
+        </div>
+        <div class="toolbox-card">
+          <div class="toolbox-icon" style="background:#fef3c7;color:#92400e">&#128202;</div>
+          <div class="toolbox-name">market-researcher</div>
+          <div class="toolbox-desc">
+            Erste Markt&uuml;bersicht und Pr&auml;sentationen &mdash; &uuml;berschneidet sich mit den beiden Werkzeugk&auml;sten oben.
+          </div>
+          <div class="toolbox-skills">
+            <span class="skill-tag mr">/market-researcher:sector-overview</span>
+            <span class="skill-tag mr">/market-researcher:comps-analysis</span>
+            <span class="skill-tag mr">/market-researcher:competitive-analysis</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HELP BOX -->
+    <section style="padding-bottom:0">
+      <div class="help-box">
+        <p>
+          <strong>&#128161; F&uuml;r Einsteiger:</strong> Du musst die Befehle nicht selbst tippen.
+          Sag einfach den Sektor und deine Firmen-Favoriten &mdash; die Schritte werden nacheinander
+          ausgef&uuml;hrt und jedes Ergebnis in einfacher Sprache erkl&auml;rt.
+          <strong>Das Ziel:</strong> Sektor verstehen &rarr; 5 Firmen pr&uuml;fen &rarr; Kaufentscheidung treffen.
+        </p>
+      </div>
+    </section>
+
+    <!-- 6 STEPS -->
+    <section>
+      <div class="section-header">
+        <div class="section-title">Der Workflow in 6 Schritten</div>
+        <div class="section-desc">Von der ersten Sektor-Idee bis zur dokumentierten Kaufentscheidung</div>
+      </div>
+      <div class="step-grid">
+
+        <!-- Step 1 -->
+        <div class="step-card">
+          <div class="step-header">
+            <div class="step-number" style="background:var(--primary)">1</div>
+            <div class="step-title">Den Sektor verstehen</div>
+          </div>
+          <div class="step-desc">
+            Erstellt einen &Uuml;berblicksbericht: Wie gro&szlig; ist der Markt? Wer sind die wichtigsten Spieler?
+            Welche Trends treiben das Wachstum (z.&nbsp;B. KI-Sicherheit, Cloud)?
+            <strong>Dein Crashkurs ins Thema, bevor du einzelne Firmen anschaust.</strong>
+          </div>
+          <div class="step-skills">
+            <span class="skill-tag er">/equity-research:sector</span>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card">
+          <div class="step-header">
+            <div class="step-number" style="background:#6366f1">2</div>
+            <div class="step-title">Kandidaten finden &amp; auf 5 eingrenzen</div>
+          </div>
+          <div class="step-desc">
+            Durchsucht den Markt nach passenden Firmen (z.&nbsp;B. &bdquo;wachsend, profitabel, Cybersecurity&rdquo;)
+            und liefert eine Liste. Daraus w&auml;hlst du deine 5 Favoriten aus &mdash;
+            z.&nbsp;B. CrowdStrike, Palo Alto Networks, Zscaler, Fortinet, SentinelOne.
+          </div>
+          <div class="step-skills">
+            <span class="skill-tag er">/equity-research:screen</span>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card">
+          <div class="step-header">
+            <div class="step-number" style="background:#8b5cf6">3</div>
+            <div class="step-title">Die 5 nebeneinander vergleichen</div>
+          </div>
+          <div class="step-desc">
+            <strong>Wer ist besser positioniert?</strong> Wer w&auml;chst schneller, hat den besseren
+            &bdquo;Burggraben&rdquo; (schwer kopierbares Gesch&auml;ft)?
+            <strong>Wer ist g&uuml;nstiger bewertet?</strong> Kennzahlen zeigen, welche Aktien im
+            Vergleich teuer oder g&uuml;nstig sind. So siehst du, ob du einen &uuml;berzogenen Preis zahlst.
+          </div>
+          <div class="step-skills">
+            <span class="skill-tag fa">/financial-analysis:competitive-analysis</span>
+            <span class="skill-tag fa">/financial-analysis:comps</span>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card">
+          <div class="step-header">
+            <div class="step-number" style="background:#10b981">4</div>
+            <div class="step-title">Tiefenanalyse pro Firma</div>
+          </div>
+          <div class="step-desc">
+            Der ausf&uuml;hrlichste Bericht: Gesch&auml;ftsmodell, Finanzkennzahlen, Risiken,
+            Bewertung und Fazit. <strong>Die eigentliche Hausaufgabe vor einem Kauf.</strong>
+            F&uuml;hre diesen Schritt f&uuml;r jede der 5 oder zumindest die 2&ndash;3 Favoriten aus Schritt 3 durch.
+          </div>
+          <div class="step-skills">
+            <span class="skill-tag er">/equity-research:initiate</span>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="step-card">
+          <div class="step-header">
+            <div class="step-number" style="background:#f59e0b">5</div>
+            <div class="step-title">Fairen Wert sch&auml;tzen</div>
+          </div>
+          <div class="step-desc">
+            Sch&auml;tzt, was eine Aktie &bdquo;eigentlich wert&rdquo; ist, basierend auf
+            zuk&uuml;nftigen Gewinnen (DCF = Discounted Cash Flow). Der Vergleich mit dem
+            aktuellen Kurs zeigt: Ist die Aktie unter- oder &uuml;berbewertet?
+            <strong>Optional, aber stark empfohlen.</strong>
+          </div>
+          <div class="step-skills">
+            <span class="skill-tag fa">/financial-analysis:dcf</span>
+          </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="step-card">
+          <div class="step-header">
+            <div class="step-number" style="background:#ef4444">6</div>
+            <div class="step-title">Entscheidung festhalten</div>
+          </div>
+          <div class="step-desc">
+            Halte fest: <strong>Warum</strong> kaufst du? Was muss eintreten, damit die These stimmt?
+            Woran merkst du, dass du falsch lagst? <strong>Das Wertvollste</strong> &mdash;
+            du kannst sp&auml;ter ehrlich pr&uuml;fen, ob deine Annahme noch gilt.
+          </div>
+          <div class="step-skills">
+            <span class="skill-tag er">/equity-research:thesis</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SCHNELL-WORKFLOW -->
+    <section>
+      <div class="section-header">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+          <div class="section-title" style="margin-bottom:0">Schnell-Workflow: Eine einzelne Aktie analysieren</div>
+          <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;font-family:var(--mono);white-space:nowrap">SCHNELL</span>
+        </div>
+        <div class="section-desc">Du kennst die Firma schon und willst wissen: Ist die Aktie kaufenswert? &mdash; 3 Schritte, kein Sektor-Umweg, direkt zur Entscheidung</div>
+      </div>
+      <div class="step-grid" style="grid-template-columns: repeat(3,1fr)">
+
+        <!-- Schnell Step 1 -->
+        <div class="step-card" style="border-top: 3px solid #f59e0b">
+          <div class="step-header">
+            <div class="step-number" style="background:#f59e0b">1</div>
+            <div class="step-title">Firmenanalyse</div>
+          </div>
+          <div class="step-desc">
+            Vollst&auml;ndige Analyse der Firma: Gesch&auml;ftsmodell, Wachstum, Finanzkennzahlen,
+            Risiken und erste Einsch&auml;tzung zur Bewertung.
+            <strong>Direkt bei der Firma einsteigen &mdash; ohne Sektor-Umweg.</strong>
+          </div>
+          <div class="step-skills">
+            <span class="skill-tag er">/equity-research:initiate</span>
+          </div>
+        </div>
+
+        <!-- Schnell Step 2 -->
+        <div class="step-card" style="border-top: 3px solid #f97316">
+          <div class="step-header">
+            <div class="step-number" style="background:#f97316">2</div>
+            <div class="step-title">Fairen Wert sch&auml;tzen <span style="font-size:11px;font-weight:500;color:var(--text-muted)">(optional)</span></div>
+          </div>
+          <div class="step-desc">
+            Cashflow-basierte Bewertung (DCF). Zeigt, ob die Aktie zum aktuellen Kurs
+            g&uuml;nstig, fair oder zu teuer ist.
+            <strong>Optional, aber stark empfohlen.</strong>
+          </div>
+          <div class="step-skills">
+            <span class="skill-tag fa">/financial-analysis:dcf</span>
+          </div>
+        </div>
+
+        <!-- Schnell Step 3 -->
+        <div class="step-card" style="border-top: 3px solid #ef4444">
+          <div class="step-header">
+            <div class="step-number" style="background:#ef4444">3</div>
+            <div class="step-title">These dokumentieren <span style="font-size:11px;font-weight:500;color:var(--text-muted)">(optional)</span></div>
+          </div>
+          <div class="step-desc">
+            Kernthese, Risiken und klare Ausstiegskriterien festhalten &mdash; damit du sp&auml;ter
+            ehrlich pr&uuml;fen kannst, ob deine Annahmen noch stimmen.
+            <strong>Das Wertvollste.</strong>
+          </div>
+          <div class="step-skills">
+            <span class="skill-tag er">/equity-research:thesis</span>
+          </div>
+        </div>
+
+      </div>
+      <div class="help-box" style="margin-top:18px">
+        <p>
+          <strong>&#9889; Tipp:</strong> Einfach sagen: &bdquo;Analysiere mir [Firmenname / Ticker]&ldquo; &mdash;
+          der Rest l&auml;uft automatisch. Der Schnell-Workflow ist ideal, wenn du eine Firma bereits kennst
+          und gezielt einsteigen m&ouml;chtest.
+        </p>
+      </div>
+    </section>
+
+    <!-- SKILLS TABLE -->
+    <section>
+      <div class="section-header">
+        <div class="section-title">Alle Skills im &Uuml;berblick</div>
+        <div class="section-desc">S&auml;mtliche verf&uuml;gbaren Befehle des Financial-Services-Plugins</div>
+      </div>
+      <div class="skills-table-wrap">
+        <table class="skills-table">
+          <thead>
+            <tr>
+              <th>Skill / Befehl</th>
+              <th>Werkzeugkasten</th>
+              <th>Schritt</th>
+              <th>Was er macht</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>/equity-research:sector</td>
+              <td><span class="skill-tag er">equity-research</span></td>
+              <td>Schritt 1</td>
+              <td>Sektor&uuml;berblick: Marktgr&ouml;&szlig;e, Trends, wichtige Spieler</td>
+            </tr>
+            <tr>
+              <td>/equity-research:screen</td>
+              <td><span class="skill-tag er">equity-research</span></td>
+              <td>Schritt 2</td>
+              <td>Aktien-Screening: passende Firmen im Markt finden</td>
+            </tr>
+            <tr>
+              <td>/financial-analysis:competitive-analysis</td>
+              <td><span class="skill-tag fa">financial-analysis</span></td>
+              <td>Schritt 3</td>
+              <td>Wettbewerbsanalyse: Wer ist st&auml;rker positioniert?</td>
+            </tr>
+            <tr>
+              <td>/financial-analysis:comps</td>
+              <td><span class="skill-tag fa">financial-analysis</span></td>
+              <td>Schritt 3</td>
+              <td>Bewertungsvergleich: Welche Aktien sind teuer/g&uuml;nstig?</td>
+            </tr>
+            <tr>
+              <td>/equity-research:initiate</td>
+              <td><span class="skill-tag er">equity-research</span></td>
+              <td>Schritt 4</td>
+              <td>Tiefenanalyse: Gesch&auml;ftsmodell, Finanzen, Risiken, Fazit</td>
+            </tr>
+            <tr>
+              <td>/financial-analysis:dcf</td>
+              <td><span class="skill-tag fa">financial-analysis</span></td>
+              <td>Schritt 5</td>
+              <td>Unternehmensbewertung (DCF): Was ist die Aktie wert?</td>
+            </tr>
+            <tr>
+              <td>/equity-research:thesis</td>
+              <td><span class="skill-tag er">equity-research</span></td>
+              <td>Schritt 6</td>
+              <td>Investment-These dokumentieren mit Risiken &amp; Scorecard</td>
+            </tr>
+            <tr>
+              <td>/financial-analysis:audit-xls</td>
+              <td><span class="skill-tag fa">financial-analysis</span></td>
+              <td>Zusatz</td>
+              <td>Excel-Modell auf Fehler pr&uuml;fen</td>
+            </tr>
+            <tr>
+              <td>/equity-research:earnings-analysis</td>
+              <td><span class="skill-tag er">equity-research</span></td>
+              <td>Zusatz</td>
+              <td>Quartalszahlen analysieren nach Ver&ouml;ffentlichung</td>
+            </tr>
+            <tr>
+              <td>/equity-research:model-update</td>
+              <td><span class="skill-tag er">equity-research</span></td>
+              <td>Zusatz</td>
+              <td>Finanzmodell mit neuen Daten aktualisieren</td>
+            </tr>
+            <tr>
+              <td>/equity-research:catalyst-calendar</td>
+              <td><span class="skill-tag er">equity-research</span></td>
+              <td>Zusatz</td>
+              <td>Katalysator-Kalender: anstehende Ereignisse tracken</td>
+            </tr>
+            <tr>
+              <td>/equity-research:morning-note</td>
+              <td><span class="skill-tag er">equity-research</span></td>
+              <td>Zusatz</td>
+              <td>Kurze Morgennotiz zu wichtigen Marktbewegungen</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- DASHBOARD DISCLAIMER SECTION -->
+    <section>
+      <div class="section-header">
+        <div class="section-title">⚠️ So nutzt du dieses Dashboard richtig</div>
+        <div class="section-desc">Was die Zahlen bedeuten — und was sie nicht bedeuten</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Kein Investment-Advice -->
+        <div class="summary-box" style="background:#fff7ed;border-left-color:#f97316">
+          <div class="summary-headline" style="color:#c2410c">🚫 Kein Investment-Advice — kein Aufruf zum Kauf</div>
+          <div class="summary-text" style="color:#7c2d12">
+            Alle Inhalte dieses Dashboards — Kennzahlen, DCF-Modelle, Investment-Thesen, Überzeugungslevel — dienen
+            <strong>ausschließlich zur persönlichen Analyse und Weiterbildung</strong>. Sie stellen keine
+            Finanz- oder Anlageberatung dar und sind kein Aufruf zum Kauf oder Verkauf von Wertpapieren.
+            Investitionsentscheidungen trägst du stets selbst — ideally nach eigener Due Diligence oder
+            Rücksprache mit einem zugelassenen Finanzberater.
+          </div>
+        </div>
+
+        <!-- DCF-Modelle -->
+        <div class="summary-box" style="background:#fef2f2;border-left-color:#ef4444">
+          <div class="summary-headline" style="color:#991b1b">📊 DCF-Modelle: Was sie können und was nicht</div>
+          <div class="summary-text" style="color:#7f1d1d">
+            Ein DCF (Discounted Cash Flow) berechnet den <em>heutigen</em> Wert der nächsten 5 Jahre Unternehmens-Cashflow.
+            Das ist ein nützliches Werkzeug — aber kein Orakel. Beachte:
+            <ul style="margin:8px 0 0 18px;line-height:1.8">
+              <li><strong>SELL ≠ Verkaufsempfehlung:</strong> Ein DCF-SELL bedeutet, die Aktie handelt über dem 5-Jahres-Modell. Der Markt bewertet Wachstum <em>nach</em> Jahr 5 — das ist legitim.</li>
+              <li><strong>Alle Annahmen sind Schätzungen:</strong> WACC, Wachstumsrate, Margen — kleine Änderungen verschieben das Ergebnis erheblich.</li>
+              <li><strong>Modell-Fehler möglich:</strong> Bei einigen Sektoren (z.&nbsp;B. NEE) kann der DCF-Wert durch Modellinkonsistenzen verzerrt sein — immer mit gesundem Menschenverstand prüfen.</li>
+              <li><strong>Datenstand:</strong> Alle Modelle basieren auf öffentlichen Filings (SEC, SEDAR) vom Juni 2026. Quartalszahlen können die Ausgangslage verändern.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Investment-Thesen -->
+        <div class="summary-box" style="background:#f0fdf4;border-left-color:#10b981">
+          <div class="summary-headline" style="color:#065f46">📋 Investment-Thesen: Strukturierte Meinung, kein Konsens</div>
+          <div class="summary-text" style="color:#064e3b">
+            Die Thesen (Schritt 6 des Workflows) sind <strong>meine persönliche, strukturierte Einschätzung</strong>
+            auf Basis der vorangegangenen Analyse-Schritte — nicht der Markt-Konsens oder eine Empfehlung eines
+            Analysten. Conviction-Sterne, Portfolio-Gewichtung und Horizont spiegeln die persönliche Risikobereitschaft wider.
+            Was zu beachten ist:
+            <ul style="margin:8px 0 0 18px;line-height:1.8">
+              <li><strong>Überzeugung ≠ Sicherheit:</strong> Auch eine ⭐⭐⭐⭐⭐-These kann falsch liegen.</li>
+              <li><strong>Horizont ist entscheidend:</strong> Viele Thesen gehen von 3–5 Jahren Haltedauer aus. Kursfristig kann es stark schwanken.</li>
+              <li><strong>Risikotabellen lesen:</strong> Jede These enthält Invalidierungssignale — das sind die Punkte, bei denen die These gebrochen wäre. Immer mitdenken.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bewertungskennzahlen -->
+        <div class="summary-box" style="background:#eff6ff;border-left-color:#3b82f6">
+          <div class="summary-headline" style="color:#1e40af">📐 Bewertungskennzahlen: Kontext ist alles</div>
+          <div class="summary-text" style="color:#1e3a8a">
+            Kennzahlen wie EV/Revenue, Rule of 40, FCF-Marge und NRR sind nützliche Vergleichsgrößen — aber nur
+            im richtigen Kontext aussagekräftig:
+            <ul style="margin:8px 0 0 18px;line-height:1.8">
+              <li><strong>Sektorvergleich:</strong> Ein EV/Revenue von 15x ist für ein SaaS-Unternehmen mit 30% Wachstum normal — für einen Energieversorger extrem teuer.</li>
+              <li><strong>Historischer Kontext:</strong> Die aktuellen Multiples gelten zum Datenstand Juni 2026. Multiples können sich schnell verändern.</li>
+              <li><strong>Kein einzelner Wert entscheidet:</strong> Gute Investitionen basieren auf dem Gesamtbild — Burggraben, Wachstum, Management, Bewertung, Risiko.</li>
+              <li><strong>Marktkapitalisierungen:</strong> In Milliarden USD (ausgenommen kanadische Micro-Caps in CAD).</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Datenbasis -->
+        <div class="summary-box" style="background:var(--surface-2);border-left-color:var(--text-muted)">
+          <div class="summary-headline" style="color:var(--text)">🗂️ Datenbasis und Aktualität</div>
+          <div class="summary-text" style="color:var(--text-muted)">
+            Alle Daten basieren auf öffentlich verfügbaren Quellen: SEC-Filings (10-K, 10-Q, 8-K), SEDAR-Einreichungen,
+            Unternehmens-Investor-Relations-Seiten, Bloomberg-Konsensschätzungen und KI-gestützter Recherche (Claude).
+            <strong>Datenstand: Juni 2026.</strong> Quartalszahlen, Guidance-Updates oder Marktbewegungen danach sind
+            nicht berücksichtigt. Für aktuelle Daten nutze den <code>/equity-research:model-update</code>-Skill.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /workflowContent -->
+
+  <!-- WEEKLY REVIEW CONTENT -->
+  <div id="weeklyContent" style="display:none">
+
+    <section style="padding: 32px 0 0;">
+      <div class="section-desc" id="weeklyDesc">Wochenrückblick wird geladen…</div>
+    </section>
+
+    <div class="market-tiles" id="weeklyTiles" style="margin: 16px 0 32px;"></div>
+
+    <section>
+      <div class="d-section-title" id="weeklyTableTitle">Picks der Woche</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:10px;">Tag</th>
+              <th style="text-align:left; padding:10px;">Sektor</th>
+              <th style="text-align:left; padding:10px;">Ticker</th>
+              <th style="text-align:right; padding:10px;">Kurs bei Pick</th>
+              <th style="text-align:right; padding:10px;">Aktueller Kurs</th>
+              <th style="text-align:right; padding:10px;">Performance</th>
+            </tr>
+          </thead>
+          <tbody id="weeklyTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section style="margin-top:40px;">
+      <div class="d-section-title">Frühere Wochenrückblicke</div>
+      <p style="font-size:13px; color:#888; margin-bottom:12px;">
+        Wähle eine vergangene Woche, um deren Stand anzusehen.
+      </p>
+      <select id="weeklyArchiveSelect" onchange="renderWeeklyFromArchive(this.value)"
+        style="padding:8px 12px; border-radius:8px; border:1px solid #ddd; font-size:14px; min-width:260px;">
+        <option value="">– aktuelle Woche wird oben angezeigt –</option>
+      </select>
+    </section>
+
+  </div><!-- /weeklyContent -->
+
+  <!-- PERFORMANCE CONTENT -->
+  <div id="performanceContent" style="display:none">
+
+    <section style="padding: 32px 0 0;">
+      <div class="section-desc" id="perfMarketDesc">
+        Performance aller Long-Picks seit Start des Sektor-Radars — täglich aktualisiert
+      </div>
+    </section>
+
+    <div class="market-tiles" id="perfTiles" style="margin: 16px 0 32px;"></div>
+
+    <section>
+      <div class="d-section-title">Alle Picks im Überblick</div>
+      <div style="overflow-x:auto;">
+        <table class="compare-table" id="perfTable" style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:10px;">Datum</th>
+              <th style="text-align:left; padding:10px;">Sektor</th>
+              <th style="text-align:left; padding:10px;">Ticker</th>
+              <th style="text-align:left; padding:10px;">Name</th>
+              <th style="text-align:right; padding:10px;">Kurs bei Pick</th>
+              <th style="text-align:right; padding:10px;">Aktueller Kurs</th>
+              <th style="text-align:right; padding:10px;">Performance</th>
+            </tr>
+          </thead>
+          <tbody id="perfTableBody">
+            <!-- wird per JS befüllt -->
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:13px; color:#888; margin-top:12px;">
+        Hinweis: "Aktueller Kurs" wird bei jedem täglichen Lauf des Sektor-Radars für alle bisherigen
+        Picks aktualisiert. Picks ohne erfassten "Kurs bei Pick" (z. B. aus der Zeit vor Einführung
+        dieses Trackings) zeigen "n/a" bei der Performance.
+      </p>
+    </section>
+
+  </div><!-- /performanceContent -->
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer">
+    <div class="disclaimer-title">Wichtiger Hinweis</div>
+    <p>
+      Dieses Dashboard dient ausschließlich zu Informations- und Bildungszwecken und stellt
+      keine Anlageberatung oder Kaufempfehlung dar. Alle Kennzahlen basieren auf öffentlich
+      verfügbaren Quellen (SEC-Berichte, Yahoo Finance, GuruFocus, Juni 2026).
+      Aktienpreise ändern sich täglich. Investitionsentscheidungen sollten immer auf Basis
+      eigener Recherche und gegebenenfalls in Absprache mit einem zugelassenen Finanzberater getroffen werden.
+    </p>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   SECTOR DATA
+═══════════════════════════════════════════════════════ */
+
+const SECTORS = {
+  health: {
+    name: 'Health — Pharma & Biotech',
+    lastUpdated: '19. Juni 2026',
+    hero: {
+      eyebrow: 'Sektor: Health',
+      title: 'Wo liegen die besten<br/>Long-Ideen in Health?',
+      sub: 'Fünf führende Unternehmen aus Pharma, Biotech und MedTech — von GLP-1-Monopolisten über Roboter-Chirurgie bis zur Immunologie-Dominanz. Autonome Tagesanalyse vom 19. Juni 2026.',
+      heroClass: '',
+      stats: [
+        { val: '$5,4 Bio.', label: 'Globaler Healthcare-Markt' },
+        { val: '5–10% p.a.', label: 'Erwartetes Marktwachstum' },
+        { val: '5', label: 'Analysierte Aktien' },
+        { val: '19. Juni 2026', label: 'Datenstand der Analyse' },
+      ],
+    },
+    marketTitle: 'Der Health-Markt auf einen Blick',
+    marketDesc: 'Warum Healthcare & Biotech als Sektor interessant ist',
+    marketTiles: [
+      { label: 'GLP-1-Markt weltweit (2030)', val: '$130 Mrd.', sub: 'Eli Lilly hält 60% US-Marktanteil — Mounjaro Q1 2026 +125% auf $8,7 Mrd.' },
+      { label: 'Digital Health CAGR bis 2034', val: '21,6% p.a.', sub: 'Schnellstes Segment im Gesundheitswesen — von $492 Mrd. auf $2,35 Bio.' },
+      { label: 'AbbVie Immunologie 2026E', val: '$31,8 Mrd.', sub: 'Skyrizi $21,6 Mrd. + Rinvoq $10,2 Mrd. — kombiniertes Wachstum >20% YoY' },
+      { label: 'da Vinci 5 Systeme Q1 2026', val: '232', sub: 'Intuitive Surgical: +58% YoY — da Vinci 5 Replacement-Superzyklus in Gang' },
+    ],
+    helpText: '<strong>Wie lese ich dieses Dashboard?</strong> Healthcare & Biotech verbindet Innovationskraft mit defensiven Qualitäten. Jede Aktie wird nach Wachstum, Effizienz (Rule of 40), Marge, Bewertung (EV/Revenue) und Burggraben bewertet. Pharma-Burggräben entstehen durch Patente, Zulassungsbarrieren und klinische Expertise. Grün = positiv, Gelb = mittel, Rot = Vorsicht. <strong>Klicke auf eine Aktie</strong> für die ausführliche Analyse.',
+    stockTableHeaders: ['Unternehmen', 'Wachstum', 'Unternehmensgröße', 'Preis der Aktie', 'Effizienz', 'Wettb.-vorteil', 'Einschätzung'],
+    stocks: [
+      {
+        ticker: 'ABBV', name: 'AbbVie', fullName: 'AbbVie Inc.',
+        exchange: 'NYSE', color: '#3b82f6', lightBg: '#dbeafe', darkText: '#1e40af',
+        marketCap: 381, revenue: 63, growth: 12, grossMargin: 70, fcfMargin: 28,
+        ev: 457, evRev: 7.3, ruleOf40: 40, nrr: 'N/A', moat: 4,
+        verdict: 'Immunologie-Champion', verdictColor: '#3b82f6', verdictBg: '#dbeafe', priceLabel: 'Günstig',
+        dcf: { recommendation: 'BUY', target: 245, upside: 13.2, currentPrice: 216, bear: -15, bull: 30 },
+        thesis: { position: 'Long', conviction: 4, horizon: '3–5 Jahre', note: 'Skyrizi ($21,6 Mrd.E) + Rinvoq ($10,2 Mrd.E) wachsen kombiniert >20% in 2026 und ersetzen Humira dauerhaft. AbbVie hat 2026 Guidance auf $67,3 Mrd. erhöht — starke FCF-Generierung bei 7,3x EV/Revenue.' },
+        what: 'AbbVie ist Weltmarktführer in der modernen Immunologie. Skyrizi (Psoriasis, IBD) und Rinvoq (Rheuma, Gastroenterologie) haben Humira vollständig ersetzt und wachsen kombiniert >20% YoY. Mit $67,3 Mrd. Jahresumsatz-Guidance (2026) ist AbbVie ein stabiler Compounder mit starker FCF-Generierung.',
+        bull: 'Skyrizi 2026E $21,6 Mrd. (+29% YoY) — das stärkste Biologikum seiner Klasse. Rinvoq $10,2 Mrd. (+20%) wächst rasant in Gastroenterologie und Rheuma. AbbVie hat 2026 Guidance auf $67,3 Mrd. erhöht — stabile Basis für weiteres EPS-Wachstum und Dividendenerhöhungen.',
+        bear: 'Humira-Biosimilar-Erosion ist Vergangenheit, aber Skyrizi/Rinvoq-Patente laufen ab 2030. Netto-Verschuldung noch erhöht ($62 Mrd. Net Debt). IRA-Preisverhandlungen könnten künftige Biologika-Preissetzung begrenzen.',
+        radarScores: [27, 40, 70, 100, 80],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 2, explain: 'Arzt-Netzwerke und Patienten-Support-Programme binden Immunologie-Patienten; Biologika-Empfehlung folgt Erfahrung des Arztes' },
+          { name: 'Wechselhürden',   score: 3, explain: 'Patienten auf Biologika wechseln selten — Remission einmal erreicht, bleibt man auf dem Wirkstoff. Skyrizi/Rinvoq-Wechsel ist klinisch kompliziert' },
+          { name: 'Skalenvorteile',  score: 3, explain: 'Größter Immunologie-Vertrieb weltweit, $7+ Mrd. R&D-Budget, proprietäres Biologika-Manufacturing' },
+          { name: 'KI / Datenvorteil', score: 2, explain: 'Jahrzehnte Biologika-Patientendaten für KI-gestützte Indikationserweiterungen und Dosierungsoptimierung' },
+        ],
+        strategy: 'AbbVie verfolgt eine "Replace & Expand"-Strategie: Humira-Erosion durch Skyrizi/Rinvoq überkompensieren und in neue Indikationen expandieren. Rinvoq-Zulassungen für Vitiligo und Alopecia Areata stehen 2026 an. Pipeline: Emraclidine (Schizophrenie, Phase 3) und drei Onkologie-Assets diversifizieren das Portfolio langfristig.',
+        scenarios: {
+          bull: { pct: 30, text: 'Skyrizi/Rinvoq übertreffen $35 Mrd. kombiniert bis 2028. Emraclidine (Schizophrenie) wird Blockbuster. EV/Rev expandiert auf 9–10x → +30% Upside' },
+          base: { pct: 45, text: 'Kombiniertes Immunologie-Wachstum 15–20% YoY. AbbVie 2026 Revenue $67,3 Mrd. → FCF-Rendite ~7% → 10–12% p.a. Gesamtrendite' },
+          bear: { pct: 25, text: 'IRA-Preisverhandlungen belasten früher als erwartet. Pipeline enttäuscht. EV/Rev komprimiert auf 5x → -15% Downside' },
+        },
+        summary: {
+          emoji: '💊', text: 'AbbVie ist die günstigste Immunologie-Story unter Large-Cap-Pharma: 7,3x EV/Revenue für ein Unternehmen, das seinen Umsatz trotz Humira-Biosimilars um 12% steigert. Skyrizi und Rinvoq haben Humira nicht nur ersetzt — sie übertreffen es bereits in Summe. Mit 2026-Guidance von $67,3 Mrd. und kombiniertem Immunologie-Wachstum von >20% YoY ist AbbVie ein seltenes Beispiel für einen Pharma-Compounder mit klarer Wachstumssichtbarkeit über 5+ Jahre.',
+          borderColor: '#3b82f6', bgColor: '#eff6ff',
+        },
+      },
+      {
+        ticker: 'ISRG', name: 'Intuitive Surgical', fullName: 'Intuitive Surgical, Inc.',
+        exchange: 'Nasdaq', color: '#8b5cf6', lightBg: '#ede9fe', darkText: '#5b21b6',
+        marketCap: 155, revenue: 11.5, growth: 23, grossMargin: 68, fcfMargin: 30,
+        ev: 148, evRev: 12.9, ruleOf40: 53, nrr: 'N/A', moat: 5,
+        verdict: 'Marktmonopol', verdictColor: '#8b5cf6', verdictBg: '#ede9fe', priceLabel: 'Fair',
+        dcf: { recommendation: 'BUY', target: 310, upside: 11.9, currentPrice: 277, bear: -20, bull: 30 },
+        thesis: { position: 'Long', conviction: 4, horizon: '3–5 Jahre', note: 'Q1 2026: +23% Umsatzwachstum, 232 neue da Vinci 5 Systeme (+58% YoY), Prozedurwachstum +17%. 86% Recurring Revenue aus Instrument-Verbrauch. Monopol in der Roboterchirurgie — kein Wettbewerber in Sicht.' },
+        what: 'Intuitive Surgical ist der weltweite Monopolist in der robotisch-assistierten Chirurgie. Q1 2026: +23% Umsatzwachstum auf $2,77 Mrd., 232 neue da Vinci 5 Systeme (+58% YoY), Prozedurwachstum +17% (da Vinci) und +39% (Ion, Lunge). 9.800+ installierte Systeme weltweit.',
+        bull: 'Da Vinci 5 Replacement-Superzyklus: 232 Systeme Q1 (+58% YoY), Nutzung übersteigt da Vinci Xi. Ion-Katheter +39% — neues $2 Mrd.+ TAM. Raised FY2026 Guidance: 13,5–15,5% Prozedurwachstum. 86% Recurring Revenue schafft Sichtbarkeit.',
+        bear: 'Bewertung 12,9x EV/Revenue ist anspruchsvoll. China und Japan bleiben Herausforderungen. Medtronic Hugo und J&J Ottava nähern sich der Marktreife, wenn auch mit geringen Marktanteilen.',
+        radarScores: [51, 53, 68, 62, 100],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 2, explain: 'Chirurgen, die auf da Vinci ausgebildet wurden, fordern das System an allen Krankenhäusern, an denen sie operieren' },
+          { name: 'Wechselhürden',   score: 3, explain: 'Multi-Millionen-Investment + Jahre Chirurgen-Training — ein Krankenhaus wechselt nicht mehr zu Konkurrenten' },
+          { name: 'Skalenvorteile',  score: 3, explain: '9.800+ installierte Systeme = unerreichbare Installationsbasis; 86% wiederkehrender Umsatz durch Instrument-Verbrauch pro Eingriff' },
+          { name: 'KI / Datenvorteil', score: 2, explain: 'Mio. aufgezeichnete Operationen für KI-Coaching (Guided Motion) — in aktiver Skalierung mit da Vinci 5' },
+        ],
+        strategy: 'Intuitive verfolgt eine "Platform+"-Strategie: Da Vinci 5 als Ankerpunkt (haptisches Feedback, 10.000x mehr Daten), Ion für Lungenkatheter, SimNow für Training. Jede Systemgeneration erhöht den Verbrauch pro System. Langfristiges Ziel: 20.000+ Systeme und $25 Mrd.+ Jahresumsatz bis Ende des Jahrzehnts.',
+        scenarios: {
+          bull: { pct: 30, text: 'Da Vinci 5 Replacement-Superzyklus beschleunigt sich. Ion übersteigt $1,5 Mrd. Umsatz 2027. FCF-Marge expandiert auf 35%+ → +30% Upside' },
+          base: { pct: 45, text: 'Wachstum 20–23% in 2026, da Vinci 5 Adoption plangemäß. EV/Rev ~12–14x → 10–12% p.a. Rendite' },
+          bear: { pct: 25, text: 'China-Herausforderungen dämpfen globales Wachstum auf <15%. Hugo (Medtronic) gewinnt erste Marktanteile. EV/Rev auf 9x → -20% Downside' },
+        },
+        summary: {
+          emoji: '🤖', text: 'Intuitive Surgical ist der überzeugendste strukturelle Burggraben im Health-Sektor. Da Vinci hat 85%+ Marktanteil in robotischer Chirurgie — eine Position, die in 30 Jahren nicht gebrochen wurde. Q1 2026 bestätigt die These: +23% Umsatzwachstum, 232 neue da Vinci 5 Systeme (+58% YoY), 86% Recurring Revenue. Das Razors-and-Blades-Modell generiert nachhaltig hohe FCF-Margen bei einem Monopol mit Pricing Power.',
+          borderColor: '#8b5cf6', bgColor: '#f5f3ff',
+        },
+      },
+      {
+        ticker: 'LLY', name: 'Eli Lilly', fullName: 'Eli Lilly and Company',
+        exchange: 'NYSE', color: '#10b981', lightBg: '#d1fae5', darkText: '#065f46',
+        marketCap: 1030, revenue: 60, growth: 45, grossMargin: 81, fcfMargin: 25,
+        ev: 1025, evRev: 17.1, ruleOf40: 70, nrr: 'N/A', moat: 5,
+        verdict: 'GLP-1-Champion', verdictColor: '#10b981', verdictBg: '#d1fae5', priceLabel: 'Teuer',
+        dcf: { recommendation: 'BUY', target: 1250, upside: 13.8, currentPrice: 1098, bear: -25, bull: 45 },
+        thesis: { position: 'Long', conviction: 5, horizon: '3–5 Jahre', note: '★ Top-Pick des Tages. Q1 2026: $19,8 Mrd. (+56% YoY), Mounjaro +125%, Zepbound +79%. Guidance auf $82–85 Mrd. erhöht. Foundayo (orales GLP-1) FDA-zugelassen April 2026 — demokratisiert Adipositas-Behandlung. 60% US-GLP-1-Marktanteil.' },
+        what: 'Eli Lilly ist der führende Pharmahersteller im GLP-1-Bereich. Q1 2026: $19,8 Mrd. Umsatz (+56% YoY), Mounjaro $8,7 Mrd. (+125%), Zepbound $4,1 Mrd. (+79%). Guidance 2026 auf $82–85 Mrd. erhöht. Foundayo (Orforglipron) — das erste orale GLP-1 für Adipositas — wurde im April 2026 FDA-zugelassen.',
+        bull: '60% US-GLP-1-Marktanteil und Foundayo (orales GLP-1, April 2026 FDA-zugelassen) demokratisiert Adipositas-Behandlung für 90%+ unbehandelte Patienten. Mounjaro/Zepbound-Duopol auf $130 Mrd.-Markt. Guidance $82–85 Mrd. mit weiterem Upside-Potenzial.',
+        bear: 'GLP-1-Patente laufen 2030–2032 aus — Biosimilar-Einstieg bedroht Umsatzsäule. Bewertung (17,1x EV/Rev) lässt wenig Spielraum für Enttäuschungen. IRA-Preisverhandlungen drücken US-Medikamentenpreise.',
+        radarScores: [100, 70, 81, 47, 100],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 2, explain: 'GLP-1-Verschreibungsdaten fließen in Lilly-KI-Forschung zurück; Arzt-Beziehungen und Formulary-Positionen schaffen indirekte Netzwerkeffekte' },
+          { name: 'Wechselhürden',   score: 3, explain: 'Patienten bleiben 3–5+ Jahre auf GLP-1-Therapie; einmal eingestellt, kaum Wechsel zu Konkurrenten ohne Indikationswechsel' },
+          { name: 'Skalenvorteile',  score: 3, explain: 'Manufacturing-Kapazität für Inkretine (Marion, Indianapolis, Irland) — jahrelanger Vorsprung; FDA-Compliance-Know-how' },
+          { name: 'KI / Datenvorteil', score: 3, explain: '11+ GLP-1-Pipeline-Assets und einzigartiger Erfahrungsschatz aus 50+ GLP-1-Studien — uneinholbarer Vorsprung in der Klasse' },
+        ],
+        strategy: 'Lillys Strategie: GLP-1-Führung ausbauen und neue Anwendungen erschließen. Foundayo (orales GLP-1) demokratisiert den Adipositas-Markt. Zepbound-Indikationserweiterungen: Schlafapnoe, Herzinsuffizienz, NASH. Donanemab (Alzheimer) im laufenden Rollout. Pipeline: >10 Phase-3-Assets in Immunologie und Onkologie als nächste Wachstumswelle.',
+        scenarios: {
+          bull: { pct: 30, text: 'Foundayo (oral GLP-1) wird globaler Blockbuster: TAM verdoppelt sich auf $260 Mrd.+. Guidance $85+ Mrd. übertroffen. LLY auf $1.400+ → +27% Upside' },
+          base: { pct: 45, text: 'GLP-1-Duopol bleibt stabil, Foundayo skaliert schrittweise. Revenue $83 Mrd. 2026. DCF-Ziel $1.250 → +14% Upside' },
+          bear: { pct: 25, text: 'IRA-Preisdruck + Biosimilar-Unsicherheit ab 2030 + Wachstumsverlangsamung unter 30%: Korrektur auf 12x EV/Rev → -25% Downside' },
+        },
+        summary: {
+          emoji: '👑', text: 'Eli Lilly ist der Top-Pick des Tages. Mit +56% Umsatzwachstum in Q1 2026 auf $19,8 Mrd. ist Lilly das am schnellsten wachsende Mega-Cap-Pharmaunternehmen weltweit — angetrieben von GLP-1-Agonisten und dem historischen Durchbruch in Adipositas-Behandlung. Foundayo (oral GLP-1, April 2026 zugelassen) adressiert 90%+ unbehandelte Patienten. 60% US-Marktanteil. Guidance 2026 auf $82–85 Mrd. erhöht.',
+          borderColor: '#10b981', bgColor: '#f0fdf4',
+        },
+      },
+      {
+        ticker: 'REGN', name: 'Regeneron', fullName: 'Regeneron Pharmaceuticals, Inc.',
+        exchange: 'Nasdaq', color: '#f59e0b', lightBg: '#fef3c7', darkText: '#92400e',
+        marketCap: 70, revenue: 15.8, growth: 19, grossMargin: 78, fcfMargin: 30,
+        ev: 65, evRev: 4.1, ruleOf40: 49, nrr: 'N/A', moat: 4,
+        verdict: 'Value-Pharma', verdictColor: '#f59e0b', verdictBg: '#fef3c7', priceLabel: 'Günstig',
+        dcf: null,
+        thesis: { position: 'Long', conviction: 3, horizon: '2–3 Jahre', note: 'Günstigstes Multiple im Peer-Set (4,1x EV/Rev) trotz 78% Bruttomarge und $4+ Mrd. FCF p.a. Q1 2026: +19% Umsatzwachstum, Dupixent +31% auf CC-Basis. FY2026 Guidance $15,75 Mrd.' },
+        what: 'Regeneron ist eines der profitabelsten Biotech-Unternehmen der Welt. Q1 2026: Gesamtumsatz +19% YoY auf $3,6 Mrd. Dupixent (Ekzem, Asthma, COPD, CSU) wächst global +31% auf CC-Basis auf $4,9 Mrd. im Quartal. FY2026 Guidance $15,75 Mrd.',
+        bull: 'Dupixent COPD (2024 zugelassen) + CSU + neue Indikationen treiben nächste Wachstumsphase. 4,1x EV/Revenue ist das günstigste Multiple im Peer-Set trotz 19% Wachstum. $4+ Mrd. jährlicher FCF ermöglicht aggressive Rückkäufe.',
+        bear: 'Trotz starkem Q1 fiel die Aktie — Markt erwartet Verlangsamung. EYLEA verliert Marktanteile. Dupixent-Biosimilars ab 2032 bedrohen die Haupteinnahmequelle.',
+        radarScores: [42, 49, 78, 100, 80],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 1, explain: 'Begrenzte Netzwerkeffekte; Dupixent-Daten fließen in IL-4/IL-13-Forschungsplattform' },
+          { name: 'Wechselhürden',   score: 2, explain: 'Biologika-Patienten wechseln selten — einmal auf Dupixent eingestellt, wenig Anreiz zur Umstellung' },
+          { name: 'Skalenvorteile',  score: 2, explain: 'Gemeinsame Entwicklung mit Sanofi teilt R&D-Kosten; VelociGene-Antikörper-Plattform ist proprietär' },
+          { name: 'KI / Datenvorteil', score: 2, explain: 'VelociSuite-Technologie (Maus-Genetik) ist proprietäre F&E-Plattform mit 25+ Jahren Erfahrung' },
+        ],
+        strategy: 'Regeneron verfolgt eine "Dupixent Platform"-Strategie: IL-4/IL-13-Biologie wird auf neue Indikationen ausgedehnt (COPD, chronische Spontanurtikaria, Nierenkrankheit). Parallel baut das Unternehmen eine onkologische Pipeline (3 Phase-3-Assets). FCF-starke Aktienrückkäufe verstärken EPS-Wachstum.',
+        scenarios: {
+          bull: { pct: 25, text: 'Dupixent COPD + neue Indikationen übertreffen Erwartungen: Umsatz auf $20 Mrd.+, EV/Rev expandiert auf 6–7x → +40% Upside' },
+          base: { pct: 50, text: 'Dupixent-Wachstum 18–22% durch neue Indikationen. EV/Rev bei 4–5x — FCF-Rendite + Rückkäufe → 8–10% p.a.' },
+          bear: { pct: 25, text: 'EYLEA-Einsturz + frühzeitige Biosimilar-Einführung: EV/Rev auf 3x → -25% Downside' },
+        },
+        summary: {
+          emoji: '💰', text: 'Regeneron ist der klassische Value-Play im Health-Sektor: 78% Bruttomarge, $4+ Mrd. freier Cashflow pro Jahr — und trotzdem nur 4,1x EV/Revenue. Das günstigste Multiple im Peer-Set, trotz 19% Umsatzwachstum in Q1 2026. Dupixent ist einer der erfolgreichsten Biologika-Launches der Geschichte und wächst weiter dynamisch. Der Value-Case: FCF-Rendite und Rückkäufe schützen den Anleger, während neue COPD/CSU-Indikationen Wachstumspotenzial liefern.',
+          borderColor: '#f59e0b', bgColor: '#fffbeb',
+        },
+      },
+      {
+        ticker: 'VRTX', name: 'Vertex Pharma', fullName: 'Vertex Pharmaceuticals Inc.',
+        exchange: 'Nasdaq', color: '#ef4444', lightBg: '#fee2e2', darkText: '#991b1b',
+        marketCap: 110, revenue: 13.0, growth: 12, grossMargin: 84, fcfMargin: 35,
+        ev: 98, evRev: 7.5, ruleOf40: 47, nrr: 'N/A', moat: 5,
+        verdict: 'CF-Monopolist', verdictColor: '#ef4444', verdictBg: '#fee2e2', priceLabel: 'Günstig',
+        dcf: null,
+        thesis: { position: 'Long', conviction: 3, horizon: '3–5 Jahre', note: 'CF-Monopol (Trikafta) + Povetacicept BLA eingereicht (IgA Nephropathie, PDUFA Nov 2026) + VX-548 (Schmerz, Phase 3 Enrollment abgeschlossen) + VX-828 (next-gen CF). 84% Bruttomarge — höchste im Peer-Set. $12 Mrd.+ Cash, null Schulden.' },
+        what: 'Vertex ist der einzige Hersteller von CF-Modulatoren (Trikafta/Kaftrio/Alyftrek), die 90%+ aller Mukoviszidose-Patienten behandeln. Q1 2026: $2,99 Mrd. (+8% YoY). FY2026 Guidance $12,95–13,1 Mrd. Povetacicept BLA (IgA Nephropathie) von FDA akzeptiert, PDUFA Nov 2026.',
+        bull: 'Trikafta-Monopol — kein Wettbewerber in Sicht. Povetacicept IgA Nephropathie PDUFA Nov 2026: $5 Mrd.+ addressierbarer Markt. VX-548 (Schmerz) Phase 3 Enrollment abgeschlossen — nächste Wachstumswelle. $12 Mrd.+ Cash für Acquisitions.',
+        bear: 'CF-Markt ist begrenzt (~120.000 Patienten) und nähert sich der Sättigung. Casgevy-Adoption langsam. Povetacicept-Zulassung ungewiss. 8% Q1-Wachstum ist das niedrigste im Peer-Set.',
+        radarScores: [27, 47, 84, 100, 100],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 1, explain: 'Keine direkten Netzwerkeffekte; CF-Patienten-Registry schafft Forschungsvorteile für Pipeline-Entwicklung' },
+          { name: 'Wechselhürden',   score: 3, explain: 'CF-Patienten auf Trikafta wechseln fast nie — Wirksamkeit (FEV1-Verbesserung) ist schwer zu überbieten; Lebensqualitätsgewinn zu groß' },
+          { name: 'Skalenvorteile',  score: 2, explain: 'Proprietäre CF-Protein-Modulations-Expertise ist 20+ Jahre alt — schwer zu replizieren; FDA Fast-Track-Erfahrung' },
+          { name: 'KI / Datenvorteil', score: 2, explain: '30+ Jahre CF-Patientendaten; CRISPR-Datenbasis aus Casgevy-Studien; VX-828 next-gen CF 2H 2026 Daten' },
+        ],
+        strategy: 'Vertex verfolgt eine "Disease Leadership"-Strategie: Volle CF-Dominanz, dann Expertise auf genetische Erkrankungen übertragen. Pipeline: (1) Povetacicept IgA Nephropathie (PDUFA Nov 2026), (2) VX-548 Schmerz (Phase 3 enrollment done), (3) VX-880 Typ-1-Diabetes (Zelltherapie), (4) VX-828 next-gen CF. $12 Mrd.+ Cash und null Schulden — Akquisitions-Feuerkraft vorhanden.',
+        scenarios: {
+          bull: { pct: 30, text: 'Povetacicept Nov 2026 zugelassen + VX-548 Schmerz-Zulassung 2027: Umsatz verdoppelt sich bis 2030 auf $25+ Mrd. → +40% Upside' },
+          base: { pct: 45, text: 'CF-Monopol stabil, Povetacicept trägt ab 2027 bei. EV/Rev auf 9–10x als Pipeline-Prämie expandiert → +15% Upside' },
+          bear: { pct: 25, text: 'Povetacicept oder VX-548 scheitern: CF-Sättigungsangst drückt EV/Rev auf 5x → -30% Downside' },
+        },
+        summary: {
+          emoji: '🧬', text: 'Vertex Pharmaceuticals bietet ein seltenes Profil: 84% Bruttomarge — die höchste im Peer-Set — kombiniert mit einer der reichsten Pipelines im Sektor. Das CF-Monopol (Trikafta) liefert stabilen Cash, den Vertex in die nächste Wachstumskurve investiert. Povetacicept (IgA Nephropathie, PDUFA Nov 2026) ist der nächste potenzielle Blockbuster. Mit $12 Mrd.+ Cash und null Schulden ist Vertex in einer einzigartigen Finanzposition für Zukäufe.',
+          borderColor: '#ef4444', bgColor: '#fff5f5',
+        },
+      },
+    ],
+  },
+
+  tech: {
+    name: 'Tech — Software, AI-Infrastruktur & Halbleiter',
+    lastUpdated: '22. Juni 2026',
+    hero: {
+      eyebrow: 'Sektor: Tech',
+      title: 'Wo liegen die besten<br/>Long-Ideen in Tech?',
+      sub: 'Fünf führende Unternehmen aus KI-Infrastruktur, Halbleitern, digitaler Werbung und Enterprise-Software — vom GPU-Monopolisten über das globale Suchmonopol bis zum Social-Media-KI-Giganten. Autonome Tagesanalyse vom 22. Juni 2026.',
+      heroClass: '',
+      stats: [
+        { val: '$2,5 Bio.+', label: 'Adressierbarer Markt (Software+Semis+AI-Infra)' },
+        { val: '15–20% p.a.', label: 'Erwartetes Marktwachstum' },
+        { val: '5', label: 'Analysierte Aktien' },
+        { val: '22. Juni 2026', label: 'Datenstand der Analyse' },
+      ],
+    },
+    marketTitle: 'Der Tech-Markt auf einen Blick',
+    marketDesc: 'Warum KI-Infrastruktur, Halbleiter und Enterprise-Software als Sektor interessant sind',
+    marketTiles: [
+      { label: 'Globaler AI-Infra-Capex 2026', val: '$500 Mrd.+', sub: 'Hyperscaler investieren in Rechenzentren und Beschleuniger-Chips' },
+      { label: 'Enterprise-Software-Markt', val: '$1,2 Bio.', sub: 'KI-Agenten beschleunigen die SaaS-Konsolidierung' },
+      { label: 'Halbleiter-Weltmarkt 2026', val: '$700 Mrd.', sub: 'KI-Beschleuniger treiben Rekordwachstum' },
+      { label: 'Unternehmen mit KI-Agenten produktiv', val: '78%', sub: 'Starker Anstieg gegenüber Vorjahr' },
+    ],
+    helpText: '<strong>Wie lese ich dieses Dashboard?</strong> Jede Aktie wird mit einfachen Kennzahlen bewertet. Du siehst, ob eine Aktie gerade <strong>günstig</strong> oder <strong>teuer</strong> ist, wie schnell das Unternehmen wächst und wie stark der Vorteil gegenüber Konkurrenten ist. Grün = positiv, Gelb = mittel, Rot = Vorsicht. <strong>Klicke auf eine Aktie</strong> für eine ausführliche Erklärung — inkl. einer einfachen Zusammenfassung.',
+    stockTableHeaders: ['Unternehmen', 'Wachstum', 'Unternehmensgröße', 'Preis der Aktie', 'Effizienz', 'Wettb.-vorteil', 'Einschätzung'],
+    stocks: [
+      {
+        ticker: 'AVGO', name: 'Broadcom', fullName: 'Broadcom Inc.',
+        exchange: 'Nasdaq', color: '#3b82f6', lightBg: '#dbeafe', darkText: '#1e40af',
+        marketCap: 1950, revenue: 65, growth: 25, grossMargin: 75, fcfMargin: 40,
+        ev: 2010, evRev: 31, ruleOf40: 65, nrr: 'N/A', moat: 4,
+        verdict: 'Custom-Silicon-Profiteur', verdictColor: '#3b82f6', verdictBg: '#dbeafe', priceLabel: 'Sehr teuer',
+        dcf: { recommendation: 'BUY', target: 480, upside: 16.7, currentPrice: 411, bear: -15, bull: 30 },
+        thesis: { position: 'Long', conviction: 4, horizon: '3–5 Jahre', note: 'Custom-AI-ASICs für Hyperscaler (Google TPU, Meta MTIA) plus VMware-Software-Cashflows ergeben eine seltene Kombination aus Halbleiter-Wachstum und Software-Margen.' },
+        what: 'Broadcom liefert Netzwerk-Chips und kundenspezifische KI-Beschleuniger (ASICs) für die größten Hyperscaler und kombiniert das seit der VMware-Übernahme mit margenstarkem Infrastruktur-Software-Geschäft.',
+        bull: 'Hyperscaler diversifizieren weg von Nvidia hin zu Custom-Silicon — Broadcom ist hier der führende Partner. VMware-Integration treibt Softwaremargen weiter nach oben.',
+        bear: 'Stark abhängig von wenigen Großkunden (Google, Meta). Bewertung mit 31x EV/Revenue nach starkem Kursanstieg lässt wenig Spielraum für Wachstumsenttäuschungen.',
+        radarScores: [63, 65, 75, 26, 80],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 2, explain: 'Enge Co-Design-Partnerschaften mit Hyperscalern verstärken sich über Produktgenerationen' },
+          { name: 'Wechselhürden', score: 3, explain: 'Custom-Chip-Design-Zyklen binden Kunden über mehrere Jahre' },
+          { name: 'Skalenvorteile', score: 3, explain: 'Größte Fertigungsallokation bei TSMC für fortschrittliche Knoten' },
+          { name: 'KI / Datenvorteil', score: 2, explain: 'Tiefe Einblicke in Hyperscaler-Workloads durch Co-Entwicklung' },
+        ],
+        strategy: 'Broadcom baut sein Custom-Silicon-Geschäft für die drei größten Hyperscaler aus und integriert VMware tiefer in ein einheitliches Private-Cloud-Software-Angebot. Ziel: Halbleiter-Wachstum mit Software-ähnlichen Margen kombinieren.',
+        scenarios: {
+          bull: { pct: 30, text: 'Weitere Hyperscaler launchen Custom-Silicon-Programme mit Broadcom. Wachstum bleibt über 30%.' },
+          base: { pct: 50, text: 'Solides Wachstum um 22–25%, VMware-Margen expandieren weiter.' },
+          bear: { pct: 20, text: 'Ein Großkunde reduziert Custom-Chip-Bestellungen oder entwickelt komplett intern.' },
+        },
+        summary: {
+          emoji: '🔗', text: 'Broadcom verbindet zwei starke Trends: KI-Hardware-Diversifizierung weg von Nvidia und margenstarke Infrastruktur-Software. Die Kundenkonzentration ist ein Risiko, aber die Position als bevorzugter Custom-Silicon-Partner der größten Hyperscaler ist schwer zu kopieren.',
+          borderColor: '#3b82f6', bgColor: '#eff6ff',
+        },
+      },
+      {
+        ticker: 'GOOGL', name: 'Alphabet', fullName: 'Alphabet Inc. (Google)',
+        exchange: 'Nasdaq', color: '#8b5cf6', lightBg: '#ede9fe', darkText: '#5b21b6',
+        marketCap: 4470, revenue: 430, growth: 22, grossMargin: 58, fcfMargin: 27,
+        ev: 4370, evRev: 10, ruleOf40: 49, nrr: 'N/A', moat: 5,
+        verdict: 'Suchmonopol & KI-Cloud', verdictColor: '#8b5cf6', verdictBg: '#ede9fe', priceLabel: 'Fair',
+        dcf: { recommendation: 'BUY', target: 430, upside: 16.8, currentPrice: 368, bear: -15, bull: 28 },
+        thesis: { position: 'Long', conviction: 4, horizon: '3–5 Jahre', note: 'Google Cloud wächst mit 63% YoY deutlich schneller als AWS/Azure und ist auf dem Weg zum signifikanten Gewinntreiber. Das Suchmonopol (93% Marktanteil) liefert stabilen Cash — fairer Preis bei 10x EV/Revenue.' },
+        what: 'Alphabet betreibt mit Google das dominante Suchmonopol und hat mit Google Cloud (63% Wachstum Q1 2026) den drittgrößten und am schnellsten wachsenden Hyperscaler aufgebaut. Gemini-KI ist in alle Produkte integriert.',
+        bull: 'Google Cloud bleibt auf 60%+ Wachstumskurs und nähert sich der Profitabilität von AWS/Azure. AI Overviews in Search monetarisieren besser als erwartet. Waymo-Robotaxi als langfristiger Optionswert.',
+        bear: 'OpenAI und Perplexity erodieren Search-Marktanteile. DOJ-Kartellverfahren droht strukturelle Aufspaltung. Margendruck durch massive KI-Investitionen.',
+        radarScores: [55, 49, 58, 80, 100],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 4, explain: '3 Mrd.+ Search-Nutzer ziehen Werbekunden an, die Inhalte finanzieren — selbstverstärkender Kreislauf' },
+          { name: 'Wechselhürden', score: 3, explain: 'Android-Ökosystem, Google Workspace und Maps-Integration binden Nutzer und Unternehmen' },
+          { name: 'Skalenvorteile', score: 4, explain: 'Größter Suchindex, TPU-Custom-Chips und 11 Produktlinien mit je 1 Mrd.+ Nutzern' },
+          { name: 'KI / Datenvorteil', score: 4, explain: 'Täglich 8,5 Mrd.+ Suchanfragen trainieren und validieren KI-Modelle in Echtzeit' },
+        ],
+        strategy: 'Alphabet integriert Gemini-KI flächendeckend in Search, Maps, Gmail und Cloud, um den Übergang von regelbasierter zu KI-gestützter Suche zu führen. Google Cloud wird als eigenständige KI-Plattform für Enterprise positioniert, mit TPU-Custom-Chips als Kostenvorteil.',
+        scenarios: {
+          bull: { pct: 30, text: 'Google Cloud bleibt bei 60%+ Wachstum, AI Overviews monetarisieren besser als erwartet — Gesamtwachstum über 25%.' },
+          base: { pct: 50, text: 'Cloud normalisiert sich auf 40–50% Wachstum, Search hält Marktanteil. Solides Wachstum um 20–22%.' },
+          bear: { pct: 20, text: 'KI-basierte Suchkonkurrenz erodiert Search-Marktanteile, Cloud-Wachstum enttäuscht, DOJ-Urteil belastet.' },
+        },
+        summary: {
+          emoji: '🔍', text: 'Alphabet vereint das stärkste Suchmonopol der Welt mit dem am schnellsten wachsenden Hyperscaler. Bei 10x EV/Revenue ist das eine der günstigsten Bewertungen im Mega-Cap-Tech-Sektor — die Kombination aus defensivem Cashflow und agilem Cloud-Wachstum macht GOOGL zum attraktivsten Risk/Reward im Peer-Set.',
+          borderColor: '#8b5cf6', bgColor: '#f5f3ff',
+        },
+      },
+      {
+        ticker: 'META', name: 'Meta Platforms', fullName: 'Meta Platforms, Inc.',
+        exchange: 'Nasdaq', color: '#10b981', lightBg: '#d1fae5', darkText: '#065f46',
+        marketCap: 1490, revenue: 253, growth: 26, grossMargin: 82, fcfMargin: 18,
+        ev: 1440, evRev: 6, ruleOf40: 44, nrr: 'N/A', moat: 4,
+        verdict: 'Social-Media-KI-Gigant', verdictColor: '#10b981', verdictBg: '#d1fae5', priceLabel: 'Günstig',
+        dcf: null, thesis: null,
+        what: 'Meta betreibt die größte soziale Plattform der Welt (Facebook, Instagram, WhatsApp) mit 3,56 Mrd. täglich aktiven Nutzern und monetarisiert diese über präzise KI-gestützte Werbung. Q1 2026: +33% Umsatzwachstum auf $56,3 Mrd.',
+        bull: 'KI-Optimierung steigert Werbewirksamkeit drastisch. WhatsApp-Business-Monetarisierung in aufstrebenden Märkten ist in der Frühphase. Llama-Open-Source-Strategie schafft Ökosystem-Vorteile.',
+        bear: 'Capex-Spike von $125–145 Mrd. in 2026 drückt den freien Cashflow. Regulatorische Risiken in der EU. Jüngere Nutzer wandern zu TikTok.',
+        radarScores: [65, 44, 82, 100, 80],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 5, explain: '3,56 Mrd. täglich aktive Nutzer über FB/Instagram/WhatsApp — stärkster sozialer Netzwerkmoat weltweit' },
+          { name: 'Wechselhürden', score: 3, explain: 'Sozialer Graph, Kontakte und Inhalte sind auf der Plattform eingeschlossen — Wechsel bedeutet Neuaufbau' },
+          { name: 'Skalenvorteile', score: 4, explain: 'Größte Ad-Targeting-Infrastruktur der Welt mit proprietären KI-Modellen für Millionen Werbekunden' },
+          { name: 'KI / Datenvorteil', score: 4, explain: 'Massives Nutzerverhaltensdaten-Reservoir über 20+ Jahre — einzigartig für Werbe-KI-Training' },
+        ],
+        strategy: 'Meta investiert massiv in KI-Infrastruktur (Llama-Modelle, Custom-Silicon) um Werbe-Targeting zu verbessern und neue Monetarisierungsquellen (AI-Assistenten in WhatsApp, Ray-Ban-Brillen) zu erschließen.',
+        scenarios: {
+          bull: { pct: 25, text: 'KI-Werbung treibt CPM-Inflation, WhatsApp-Monetarisierung beschleunigt sich, Ray-Ban-AI-Brillen werden Mainstream.' },
+          base: { pct: 50, text: 'Wachstum bei 25–28%, Capex-Investitionen zahlen sich schrittweise aus. Bewertung bei 6x EV/Revenue bleibt attraktiv.' },
+          bear: { pct: 25, text: 'Capex von $125–145 Mrd. drückt FCF, KI-Investitionen monetarisieren langsamer als erwartet.' },
+        },
+        summary: {
+          emoji: '📱', text: 'Meta ist eine der günstigsten Bewertungen im Mega-Cap-Tech-Bereich: 6x EV/Revenue bei 26% Wachstum und dem stärksten sozialen Netzwerkmoat der Welt. Das Risiko liegt im massiven Capex-Zyklus 2026 — wer den Kapitalintensitäts-Peak akzeptiert, bekommt einen strukturellen Netzwerkmoat zum Schnäppchenpreis.',
+          borderColor: '#10b981', bgColor: '#f0fdf4',
+        },
+      },
+      {
+        ticker: 'MSFT', name: 'Microsoft', fullName: 'Microsoft Corporation',
+        exchange: 'Nasdaq', color: '#f59e0b', lightBg: '#fef3c7', darkText: '#92400e',
+        marketCap: 3200, revenue: 280, growth: 14, grossMargin: 69, fcfMargin: 32,
+        ev: 3190, evRev: 11, ruleOf40: 46, nrr: '>110%', moat: 5,
+        verdict: 'Plattform-Riese', verdictColor: '#f59e0b', verdictBg: '#fef3c7', priceLabel: 'Fair',
+        dcf: null, thesis: null,
+        what: 'Microsoft betreibt mit Azure die zweitgrößte Cloud-Plattform und monetarisiert KI über Copilot-Abos in Office, Teams, GitHub und Dynamics — über die größte Unternehmenssoftware-Installationsbasis der Welt.',
+        bull: 'Copilot wird zum Umsatztreiber über das gesamte Produktportfolio. OpenAI-Partnerschaft sichert Zugang zu führenden Modellen. Azure gewinnt weiter Marktanteile.',
+        bear: 'Massive Capex-Ausgaben für Rechenzentren drücken kurzfristig den freien Cashflow. Konkurrenz durch Google und AWS im Cloud-Geschäft.',
+        radarScores: [35, 46, 69, 73, 100],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 3, explain: 'Teams/Office-Ökosystem mit Milliarden Nutzern verstärkt sich selbst' },
+          { name: 'Wechselhürden', score: 3, explain: 'Tiefe Integration in Unternehmens-IT macht Wechsel extrem aufwendig' },
+          { name: 'Skalenvorteile', score: 3, explain: 'Größte Enterprise-Vertriebsorganisation und Rechenzentrums-Fußabdruck' },
+          { name: 'KI / Datenvorteil', score: 3, explain: 'Exklusiver Zugriff auf OpenAI-Modelle plus riesige Enterprise-Datenbasis' },
+        ],
+        strategy: 'Microsoft integriert Copilot als KI-Assistent in jedes Kernprodukt und monetarisiert das über Pro-Kopf-Lizenzen. Parallel wird Azure als bevorzugte Plattform für KI-Workloads ausgebaut — inklusive eigener Custom-Chips (Maia) zur Kostensenkung.',
+        scenarios: {
+          bull: { pct: 30, text: 'Copilot-Attach-Rate übertrifft Erwartungen deutlich. Azure-Wachstum beschleunigt sich wieder auf 30%+.' },
+          base: { pct: 50, text: 'Solides Wachstum um 13–16%, Copilot-Umsatz skaliert schrittweise.' },
+          bear: { pct: 20, text: 'Capex-Überinvestition drückt Margen, ohne dass Copilot-Monetarisierung im erwarteten Tempo folgt.' },
+        },
+        summary: {
+          emoji: '🏢', text: 'Microsoft ist der breiteste und am wenigsten riskante KI-Profiteur im Sektor — eine Position über praktisch jede Unternehmenssoftware-Kategorie hinweg, bei fairer Bewertung. Kein Hochrisiko-Wachstumstitel, aber ein solider Kern-Compounder.',
+          borderColor: '#f59e0b', bgColor: '#fffbeb',
+        },
+      },
+      {
+        ticker: 'NVDA', name: 'Nvidia', fullName: 'NVIDIA Corporation',
+        exchange: 'Nasdaq', color: '#ef4444', lightBg: '#fee2e2', darkText: '#991b1b',
+        marketCap: 5100, revenue: 200, growth: 40, grossMargin: 75, fcfMargin: 50,
+        ev: 5090, evRev: 25, ruleOf40: 90, nrr: 'N/A', moat: 5,
+        verdict: 'GPU-Monopolist', verdictColor: '#ef4444', verdictBg: '#fee2e2', priceLabel: 'Sehr teuer',
+        dcf: { recommendation: 'BUY', target: 280, upside: 33.3, currentPrice: 210, bear: -20, bull: 40 },
+        thesis: { position: 'Long', conviction: 5, horizon: '3–5 Jahre', note: '★ Top-Pick des Tages. Q1 FY27 Rekord: $81,6 Mrd. (+85% YoY), Data Center $75,2 Mrd. (+92%), Q2 FY27 Guidance $91 Mrd. Morningstar Fair Value $280 vs. aktuell $210 (+33%). CUDA-Moat seit 15 Jahren unangetastet.' },
+        what: 'Nvidia liefert die GPUs, die fast jedes große KI-Modell trainieren und betreiben. CUDA — die Softwareschicht rund um die Chips — macht den Wechsel zu Konkurrenten extrem aufwendig.',
+        bull: 'Hyperscaler-Capex für KI-Rechenzentren wächst weiter zweistellig. Blackwell- und Rubin-Architekturen sichern technologischen Vorsprung. Networking-Geschäft (Spectrum-X) wächst überproportional.',
+        bear: 'Custom-Silicon von Google, Amazon und Meta nimmt Marktanteile bei Inferenz-Workloads. Bewertung mit 25x EV/Revenue (TTM) lässt wenig Raum für Wachstumsenttäuschungen.',
+        radarScores: [100, 90, 75, 32, 100],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 3, explain: 'CUDA-Entwickler-Ökosystem mit Millionen Entwicklern verstärkt sich selbst' },
+          { name: 'Wechselhürden', score: 3, explain: 'Jahrzehntealter CUDA-Software-Stack macht Migration zu Konkurrenzchips sehr teuer' },
+          { name: 'Skalenvorteile', score: 3, explain: 'Größte Fertigungsallokation bei TSMC, größtes F&E-Budget im Bereich' },
+          { name: 'KI / Datenvorteil', score: 3, explain: 'Enge Zusammenarbeit mit führenden KI-Labs prägt Chip-Roadmap direkt' },
+        ],
+        strategy: 'Nvidia liefert jährlich eine neue Beschleuniger-Generation (Blackwell, danach Rubin) statt im bisherigen Zweijahresrhythmus und baut das Geschäft über GPUs hinaus aus — Networking (Spectrum-X, NVLink) und vollständige Rechenzentrums-Referenzdesigns (NVL72) erhöhen den Wert pro Hyperscaler-Kunde.',
+        scenarios: {
+          bull: { pct: 35, text: 'KI-Infrastruktur-Capex beschleunigt sich weiter, Rubin-Launch übertrifft Erwartungen, Networking-Anteil wächst stark.' },
+          base: { pct: 45, text: 'Solides Wachstum um 35–40%, Marktführerschaft bleibt trotz Custom-Silicon-Konkurrenz stabil.' },
+          bear: { pct: 20, text: 'Custom-ASICs erobern signifikante Inferenz-Marktanteile, Wachstum verlangsamt deutlich unter 25%.' },
+        },
+        summary: {
+          emoji: '👑', text: 'Nvidia ist der Top-Pick des Tages. Mit 40% Wachstum (TTM), 75% Bruttomarge und einer Software-Lock-in-Position (CUDA) seit über 15 Jahren bleibt Nvidia der zentrale Profiteur des globalen KI-Infrastruktur-Ausbaus. Morningstar-Kursziel $280 impliziert +33% Upside.',
+          borderColor: '#ef4444', bgColor: '#fff5f5',
+        },
+      },
+    ],
+  },
+
+  energie: {
+    name: 'Energie — Kernkraft, LNG & Erneuerbare',
+    lastUpdated: '17. Juni 2026',
+    hero: {
+      eyebrow: 'Sektor: Energie',
+      title: 'Wo liegen die besten<br/>Long-Ideen in Energie?',
+      sub: 'Fünf führende Unternehmen aus Kernkraft, LNG-Export, Öl & Gas und erneuerbarer Energie — vom nuklearen AI-Stromchampion über den LNG-Infrastruktur-Monopolisten bis zum Shale-Effizienzchampion. Autonome Tagesanalyse vom 17. Juni 2026.',
+      heroClass: '',
+      stats: [
+        { val: '$10 Bio.+', label: 'Globaler Energiemarkt 2026' },
+        { val: '8–12% p.a.', label: 'Wachstum Erneuerbare Energien' },
+        { val: '5', label: 'Analysierte Aktien' },
+        { val: '17. Juni 2026', label: 'Datenstand der Analyse' },
+      ],
+    },
+    marketTitle: 'Der Energie-Markt auf einen Blick',
+    marketDesc: 'AI-Stromnachfrage, LNG-Boom und Energiewende als strukturelle Treiber',
+    marketTiles: [
+      { label: 'AI-Strombedarf USA 2030', val: '+500 TWh', sub: 'Rechenzentren werden ~5% des US-Stromverbrauchs ausmachen — Kernkraft ist die einzige 24/7-Antwort' },
+      { label: 'LNG-Exportkapazität USA 2030', val: '24 Bcf/Tag', sub: 'USA wird weltgrößter LNG-Exporteur — Europa bleibt strukturell auf US-Gas angewiesen' },
+      { label: 'Kernkraft-Kapazität geplant', val: '+20 GW', sub: 'SMR und Reaktivierungen angekündigt — größte Kernkraft-Renaissance seit 30 Jahren' },
+      { label: 'US-Renewable-Kapazität 2026', val: '450+ GW', sub: 'Solar + Wind überholen erstmals Gas als installierte Kapazitätsquelle in den USA' },
+    ],
+    helpText: '<strong>Wie lese ich dieses Dashboard?</strong> Der Energie-Sektor ist heterogen: Kernkraft, Öl & Gas und Erneuerbare haben unterschiedliche Risikoprofile. Jede Aktie wird nach Wachstum, Effizienz (Rule of 40 = Wachstum + FCF-Marge), Bruttomarge, Bewertung (EV/Revenue) und Burggraben bewertet. Energie handelt auf deutlich günstigeren Multiples als Tech — alle 5 Firmen liegen unter 10x EV/Revenue. <strong>Klicke auf eine Aktie</strong> für die ausführliche Analyse.',
+    stockTableHeaders: ['Unternehmen', 'Wachstum', 'Unternehmensgröße', 'Preis der Aktie', 'Effizienz', 'Wettb.-vorteil', 'Einschätzung'],
+    stocks: [
+      {
+        ticker: 'CEG', name: 'Constellation Energy', fullName: 'Constellation Energy Group, Inc.',
+        exchange: 'Nasdaq', color: '#3b82f6', lightBg: '#dbeafe', darkText: '#1e40af',
+        marketCap: 51, revenue: 25, growth: 16, grossMargin: 33, fcfMargin: 18,
+        ev: 58, evRev: 2.3, ruleOf40: 34, nrr: 'N/A', moat: 5,
+        verdict: 'Nuklear-AI-Champion', verdictColor: '#3b82f6', verdictBg: '#dbeafe', priceLabel: 'Günstig',
+        dcf: { recommendation: 'BUY', target: 310, upside: 19.2, currentPrice: 260, bear: -20, bull: 45 },
+        thesis: { position: 'Long', conviction: 5, horizon: '3–5 Jahre', note: '★ Top-Pick des Tages. Constellation betreibt die größte CO2-freie Stromerzeugungsflotte der USA — Kernkraft liefert den zuverlässigen 24/7-Baseload ohne CO2-Emissionen, den AI-Rechenzentren benötigen. Der Microsoft-Vertrag für Three Mile Island ist erst der Anfang.' },
+        what: 'Constellation Energy betreibt 21 Kernkraftwerke in den USA und ist der weltgrößte Produzent CO2-freier Energie. KI-Rechenzentren brauchen zuverlässigen 24/7-Strom ohne CO2 — Kernkraft ist die einzige Lösung, die Sonne und Wind nicht liefern können.',
+        bull: 'Microsoft (Three Mile Island), Google und Amazon schließen aktiv Kernkraft-PPAs ab. Reaktivierungen bringen 2–3 GW Zusatzkapazität zu nahezu null Grenzkosten. Langfristige 15–20-Jahres-Verträge sichern stabile Cashflows zu Premiumpreisen.',
+        bear: 'Kernkraft ist kapitalintensiv — Reaktivierungen können über Budget laufen. Regulatorische Genehmigungen dauern länger als erwartet. Schuldenlast steigt durch das Investitionsprogramm.',
+        radarScores: [80, 34, 33, 100, 100],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 1, explain: 'Keine klassischen Netzwerkeffekte — aber wachsendes Hyperscaler-Ökosystem schafft starke Referenz-Effekte für weitere PPAs' },
+          { name: 'Wechselhürden', score: 2, explain: 'Langfristige Power-Purchase-Agreements (15–20 Jahre) mit Hyperscalern binden Kunden strukturell langfristig' },
+          { name: 'Skalenvorteile', score: 3, explain: '21 Kernkraftwerke — ein Portfolio, das in den nächsten 30+ Jahren schlicht nicht repliziert werden kann' },
+          { name: 'KI / Datenvorteil', score: 2, explain: 'Jahrzehnte Reaktorbetriebsdaten optimieren Wartung und Leistung; proprietäre Sicherheitssysteme und Betriebsexpertise' },
+        ],
+        strategy: 'Constellation verfolgt eine Dreifachstrategie: (1) Nuklearkapazität sichern — Reaktorlaufzeiten verlängern und stillgelegte Anlagen reaktivieren (Three Mile Island, Duane Arnold). (2) Hyperscaler als Anker-Kunden gewinnen: Clean-Power-PPAs mit Microsoft, Google und Amazon zu Premiumpreisen von $80–120/MWh. (3) Renewables ergänzend aufbauen — Wind und Solar als Portfolio-Ergänzung zur Kernkraft-Basislast.',
+        scenarios: {
+          bull: { pct: 35, text: 'Weitere Hyperscaler schließen 20-Jahres-PPAs zu $100+/MWh. Three Mile Island und 2 weitere Reaktivierungen liefern Strom ab 2027. Aktie auf $400+.' },
+          base: { pct: 45, text: 'Microsoft-Vertrag wird Benchmark für weitere PPAs. Revenue wächst 15% p.a. bis 2028. DCF-Ziel $310 → +19% Upside.' },
+          bear: { pct: 20, text: 'Regulatorische Hürden verzögern Reaktivierungen. PPA-Verhandlungen stocken. EV/Rev auf 1,5x → -30% Downside.' },
+        },
+        summary: {
+          emoji: '⚛️', text: 'Constellation Energy ist der Top-Pick im Energie-Sektor: Das Unternehmen steht am Schnittpunkt zweier Megatrends — KI-Infrastrukturausbau und Energiewende. Kernkraft liefert den zuverlässigen 24/7-CO2-freien Strom, den Rechenzentren fordern und den Solar und Wind nicht konstant liefern können. Der Microsoft-Vertrag für Three Mile Island ist der Startschuss für eine strukturelle Verschiebung der Energiebeschaffung. Mit 2,3x EV/Revenue ist CEG günstig für ein Unternehmen mit einer fast nicht replizierbaren Flotte von 21 Kernkraftwerken.',
+          borderColor: '#3b82f6', bgColor: '#eff6ff',
+        },
+      },
+      {
+        ticker: 'EOG', name: 'EOG Resources', fullName: 'EOG Resources, Inc.',
+        exchange: 'NYSE', color: '#8b5cf6', lightBg: '#ede9fe', darkText: '#5b21b6',
+        marketCap: 68, revenue: 22, growth: 8, grossMargin: 57, fcfMargin: 30,
+        ev: 72, evRev: 3.0, ruleOf40: 38, nrr: 'N/A', moat: 3,
+        verdict: 'Shale-Effizienzchampion', verdictColor: '#8b5cf6', verdictBg: '#ede9fe', priceLabel: 'Günstig',
+        dcf: { recommendation: 'BUY', target: 138, upside: 15.0, currentPrice: 120, bear: -20, bull: 35 },
+        thesis: { position: 'Long', conviction: 3, horizon: '2–3 Jahre', note: 'EOG ist der kosteneffizienteste US-Shale-Operator mit dem niedrigsten Break-even ($40 WTI). 30% FCF-Marge bei $80 Öl, starke Dividende + Rückkäufe. Defensives Long: Selbst bei fallenden Ölpreisen generiert EOG Cash.' },
+        what: 'EOG Resources ist der profitabelste US-Shale-Produzent mit Bohrfeldern im Permian Basin, Eagle Ford (Texas) und Dorado (Gas). EOG gilt als "Premium-Operator" — mit proprietärer Datentechnologie, die Bohrlocheffizienz maximiert und Kosten weit unter den Branchendurchschnitt drückt.',
+        bull: 'Proprietäres Precision-Drilling-System optimiert Bohrlochrenditen mit KI-gestützter Geologie. Dorado-Gasprojekt erschließt günstiges Erdgas für US-LNG-Exporteure. Kapitalrückgabe: $4+ Mrd. Dividenden + Rückkäufe pro Jahr.',
+        bear: 'WTI-Ölpreisrückgang unter $60 würde FCF-Margen deutlich belasten. Wachstum ist zyklisch und abhängig von Rohstoffpreisen. Neue OPEC+-Produktionssteigerungen könnten Ölpreise drücken.',
+        radarScores: [40, 38, 57, 100, 60],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 1, explain: 'Keine Netzwerkeffekte — Öl und Gas sind Commodities, die an Spot- und Terminmärkten gehandelt werden' },
+          { name: 'Wechselhürden', score: 1, explain: 'Keine Wechselhürden auf Kundenseite — Öl wird am Spotmarkt oder per Terminkontrakt verkauft' },
+          { name: 'Skalenvorteile', score: 2, explain: 'Eigene Precision-Drilling-Technologie und langjährige Bohrteams senken Kosten signifikant unter den Branchendurchschnitt' },
+          { name: 'KI / Datenvorteil', score: 3, explain: 'Proprietäre Geo- und Bohrdatenbasis aus 20+ Jahren optimiert Bohrlochplatzierung und Förderraten — echter technologischer Vorsprung im Shale-Sektor' },
+        ],
+        strategy: 'EOG reinvestiert ~70% des Operating Cashflows in Premium-Bohrlöcher mit höchster Kapitalrendite und schüttet den Rest als Dividenden, Sonderdividenden und Rückkäufe aus. Kapitalrendite vor Volumen. Das Dorado-Gasprojekt erschließt das günstigste US-Erdgas für LNG-Exporteure an der Golfküste.',
+        scenarios: {
+          bull: { pct: 30, text: 'WTI bleibt bei $85+, Dorado-Gas expandiert, Rückkäufe beschleunigen sich. Aktie auf $160+.' },
+          base: { pct: 45, text: 'WTI bei $75–85, solide FCF-Generierung, Dividende wächst 5–8% p.a. DCF-Ziel $138 → +15% Upside.' },
+          bear: { pct: 25, text: 'OPEC+ erhöht Produktion, WTI fällt auf $60. EOG-FCF halbiert, Rückkäufe gestoppt → -20% Downside.' },
+        },
+        summary: {
+          emoji: '🛢️', text: 'EOG Resources ist der defensivste Long-Play im Energie-Sektor: Als kosteneffizientester US-Shale-Produzent generiert EOG selbst bei $65 WTI signifikanten freien Cashflow. 30% FCF-Marge, $4+ Mrd. jährliche Kapitalrückgabe und proprietäre Bohrtechnologie machen EOG zum Qualitätsstandard im Öl-Sektor. Kein Wachstumswert — aber ein solides Value-Investment mit attraktiver Dividende und dem niedrigsten Downside-Risiko im Peer-Set.',
+          borderColor: '#8b5cf6', bgColor: '#f5f3ff',
+        },
+      },
+      {
+        ticker: 'LNG', name: 'Cheniere Energy', fullName: 'Cheniere Energy, Inc.',
+        exchange: 'NYSE', color: '#10b981', lightBg: '#d1fae5', darkText: '#065f46',
+        marketCap: 40, revenue: 16, growth: 7, grossMargin: 50, fcfMargin: 22,
+        ev: 62, evRev: 3.9, ruleOf40: 29, nrr: 'N/A', moat: 5,
+        verdict: 'LNG-Export-Monopol', verdictColor: '#10b981', verdictBg: '#d1fae5', priceLabel: 'Günstig',
+        dcf: null,
+        thesis: { position: 'Long', conviction: 3, horizon: '3–5 Jahre', note: 'Cheniere besitzt die größten US-LNG-Verflüssigungs-Terminals (Sabine Pass + Corpus Christi). Die physische Infrastruktur ist nahezu unmöglich zu replizieren — eine Genehmigung dauert 7–10 Jahre, ein Terminal kostet $10 Mrd.+ zu bauen.' },
+        what: 'Cheniere Energy ist der größte US-LNG-Exporteur mit zwei Verflüssigungs-Terminals an der Golfküste (Sabine Pass + Corpus Christi). Das Unternehmen exportiert Erdgas nach Europa und Asien und profitiert von globaler Energiesicherheits-Nachfrage nach dem Ukraine-Krieg.',
+        bull: 'Europa bezieht dauerhaft weniger russisches Gas — strukturell erhöhte LNG-Nachfrage bis 2030+. Corpus Christi Stage 3 (2025–2027) erhöht Kapazität um 10+ Mtpa. 20-Jahres-Verträge sichern langfristig stabile Cashflows.',
+        bear: 'Gas-Preis-Spread zwischen USA und Europa/Asien könnte sich einengen. Neue Konkurrenz-Terminals in Qatar und Australien erhöhen globales Angebot. Schulden von $22 Mrd. sind signifikant.',
+        radarScores: [35, 29, 50, 100, 100],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 1, explain: 'Keine klassischen Netzwerkeffekte — aber etablierte Beziehungen zu Shell, TotalEnergies und EDF sind langfristig wertvoll' },
+          { name: 'Wechselhürden', score: 3, explain: '20-Jahres-SPAs (Sales and Purchase Agreements) binden Käufer auf Jahrzehnte — ein struktureller Wechsel ist praktisch unmöglich' },
+          { name: 'Skalenvorteile', score: 3, explain: 'Zwei Terminals mit kombinierter ~50 Mtpa Kapazität sind die größten in den USA — Kostenvorteil durch Betriebsskaleneffizienz' },
+          { name: 'KI / Datenvorteil', score: 1, explain: 'Terminal-Management-Daten optimieren Beladungseffizienz und Wartungsplanung — kein signifikanter AI-Vorteil gegenüber Wettbewerbern' },
+        ],
+        strategy: 'Cheniere verfolgt eine "Anchor & Expand"-Strategie: Die bestehenden Terminals werden voll ausgelastet, dann werden neue Trains durch langfristige Verträge (SPAs) vor Baubeginn finanziert. Stage 3 in Corpus Christi ist das nächste Wachstumsprojekt. Cashflows werden für Schuldenabbau, Dividenden und Rückkäufe eingesetzt.',
+        scenarios: {
+          bull: { pct: 30, text: 'Globale LNG-Nachfrage übertrifft Angebot bis 2030. Corpus Stage 3 vollständig vertraglich gesichert. Aktie auf $240+.' },
+          base: { pct: 50, text: 'Stabile 20-Jahres-Vertragseinnahmen, kontinuierlicher Schuldenabbau, Dividendenwachstum. Solide 8–10% p.a. Rendite.' },
+          bear: { pct: 20, text: 'Henry-Hub/Global-Spread kollabiert durch Überangebot. LNG-Wettbewerb intensiviert sich → -20% Downside.' },
+        },
+        summary: {
+          emoji: '🚢', text: 'Cheniere Energy ist der unauffälligste Burggraben im Energie-Sektor: Ein LNG-Terminal zu genehmigen dauert 7–10 Jahre und kostet $10 Mrd.+ zu bauen. Cheniere hat bereits zwei davon — und langfristige 20-Jahres-Verträge mit den größten Energiekonzernen der Welt. Kein Wachstumswert, aber ein stabiler Cashflow-Generator mit einem nahezu unmöglich zu replizierenden Infrastruktur-Asset. Für konservative Anleger die solideste Long-Idee im Sektor.',
+          borderColor: '#10b981', bgColor: '#f0fdf4',
+        },
+      },
+      {
+        ticker: 'NEE', name: 'NextEra Energy', fullName: 'NextEra Energy, Inc.',
+        exchange: 'NYSE', color: '#f59e0b', lightBg: '#fef3c7', darkText: '#92400e',
+        marketCap: 132, revenue: 24, growth: 10, grossMargin: 38, fcfMargin: 8,
+        ev: 190, evRev: 7.9, ruleOf40: 18, nrr: 'N/A', moat: 4,
+        verdict: 'Erneuerbare-Riese', verdictColor: '#f59e0b', verdictBg: '#fef3c7', priceLabel: 'Günstig',
+        dcf: null,
+        thesis: { position: 'Long', conviction: 3, horizon: '3–5 Jahre', note: 'NextEra ist der weltgrößte Erzeuger erneuerbarer Energien (Wind + Solar) und gleichzeitig regulierter Versorger. Die regulierten Gewinne (FPL) sind sicher, die Renewable-Entwicklungsplattform (NEER) ist die wertvollste ihrer Art in den USA.' },
+        what: 'NextEra Energy ist der weltweit größte Produzent von Wind- und Solarstrom und betreibt Florida Power & Light — den größten regulierten Versorger der USA. Doppelte Ertragsstruktur: sichere regulierte Renditen + Wachstum durch neue Erneuerbare-Projekte.',
+        bull: 'AI-Rechenzentren und E-Mobilität treiben US-Strombedarf exponentiell — NextEra ist am besten positioniert. Florida wächst durch Bevölkerungszuzug stark. Sinkende Solar- und Windkosten verbessern Projektrenditen weiter.',
+        bear: 'Hohe Verschuldung (~$58 Mrd. Langfristschulden) macht NEE zinssensitiv. NEER hat 2023 Ziele verfehlt — Vertrauen beschädigt. Kapitalintensives Modell begrenzt freien Cashflow.',
+        radarScores: [50, 18, 38, 100, 80],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 1, explain: 'Keine direkten Netzwerkeffekte — Strom ist ein Commodity-Produkt' },
+          { name: 'Wechselhürden', score: 2, explain: 'Regulierter Versorger (FPL) hat Gebietsmonopol in Florida — Kunden können nicht wechseln' },
+          { name: 'Skalenvorteile', score: 3, explain: 'Größter Entwickler erneuerbarer Projekte in den USA: niedrigste Kosten, beste Lieferantenkonditionen, größtes Projektentwicklungs-Team' },
+          { name: 'KI / Datenvorteil', score: 2, explain: 'Wind- und Solar-Vorhersagemodelle optimieren Anlagenleistung; proprietäres Grid-Management-System für das Florida-Netz' },
+        ],
+        strategy: 'NextEra verfolgt eine "Regulated Foundation + Growth Engine"-Strategie: Florida Power & Light (FPL) liefert stabile regulierte Renditen (~7% p.a.), während NextEra Energy Resources (NEER) neue Wind-, Solar- und Speicherprojekte entwickelt und langfristig betreibt. Ziel: 23+ GW neue erneuerbare Kapazität bis 2027.',
+        scenarios: {
+          bull: { pct: 30, text: 'AI-Datenzentrum-Nachfrage übertrifft Erwartungen, Florida-Wachstum robust, Zinsen fallen. NEER-Pipeline auf 70+ GW → Aktie auf $80+.' },
+          base: { pct: 45, text: 'Reguliertes Wachstum 7–9% p.a., NEER-Pipeline stabil. Aktie auf $73–78 — solide Utility-Rendite.' },
+          bear: { pct: 25, text: 'Zinsen bleiben hoch, NEER verfehlt Ziele erneut, Florida-Regulierung verschlechtert sich → -20% Downside.' },
+        },
+        summary: {
+          emoji: '☀️', text: 'NextEra Energy ist die breiteste und sicherste Wette auf die globale Energiewende. Als weltgrößter Erzeuger erneuerbarer Energien kombiniert NEE stabile regulierte Cashflows (FPL) mit einer der wertvollsten Entwicklungsplattformen der Welt. Der hohe Schuldenstand ist ein Risiko bei anhaltend hohen Zinsen — aber bei fallenden Zinsen ist NextEra sehr gut positioniert. Ein defensiver Kern-Compounder für die Energiewende.',
+          borderColor: '#f59e0b', bgColor: '#fffbeb',
+        },
+      },
+      {
+        ticker: 'VST', name: 'Vistra', fullName: 'Vistra Corp.',
+        exchange: 'NYSE', color: '#ef4444', lightBg: '#fee2e2', darkText: '#991b1b',
+        marketCap: 45, revenue: 16, growth: 20, grossMargin: 40, fcfMargin: 20,
+        ev: 57, evRev: 3.6, ruleOf40: 40, nrr: 'N/A', moat: 3,
+        verdict: 'Power-AI-Play', verdictColor: '#ef4444', verdictBg: '#fee2e2', priceLabel: 'Günstig',
+        dcf: { recommendation: 'BUY', target: 160, upside: 23.1, currentPrice: 130, bear: -25, bull: 50 },
+        thesis: { position: 'Long', conviction: 4, horizon: '2–3 Jahre', note: 'Vistra betreibt den drittgrößten Kernkraftwerkspark der USA plus ein großes Gas- und Solar-Portfolio. Als Eigenerzeuger ohne Upstream-Rohstoffrisiko profitiert VST direkt von steigenden Strompreisen durch AI-Datenzentrum-Nachfrage in Texas.' },
+        what: 'Vistra ist einer der größten unabhängigen Stromproduzenten der USA mit >40 GW Kapazität (Gas, Kernkraft, Kohle im Ausstieg, Solar). Das Unternehmen verkauft Strom direkt an Endkunden in Texas (TXU-Brand) und über Großhandelsmärkte, wo AI-Nachfrage die Preise treibt.',
+        bull: 'ERCOT-Markt in Texas hat wenig Überkapazitäten — AI-Rechenzentren treiben Strompreise strukturell höher. Comanche Peak Kernkraftwerk (2 GW) liefert günstigen CO2-freien Baseload zu steigenden Marktpreisen. Hyperscaler-PPAs im Gespräch.',
+        bear: 'Schulden von $12 Mrd. sind signifikant. Kohle-Ausstieg verursacht Restrukturierungskosten. ERCOT-Regulierung könnte Großhandelspreise deckeln und Windfall-Gewinne begrenzen.',
+        radarScores: [100, 40, 40, 100, 60],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 1, explain: 'Keine Netzwerkeffekte — Strom ist ein Commodity-Produkt' },
+          { name: 'Wechselhürden', score: 1, explain: 'Einzelhandels-Strom in Texas: Verbraucher können Anbieter wechseln' },
+          { name: 'Skalenvorteile', score: 3, explain: 'Größtes unabhängiges Kraftwerksportfolio in Texas — Kostenvorteil durch Mix aus günstiger Kernkraft und flexibler Gaskapazität' },
+          { name: 'KI / Datenvorteil', score: 2, explain: 'Eigene Energiehandelsplattform optimiert Dispatch-Entscheidungen und Hedging-Strategie in Echtzeit' },
+        ],
+        strategy: 'Vistra transformiert sein Portfolio: Kohle raus, Kernkraft und Solar rein. Comanche Peak wird als Anker-Asset für Hyperscaler-PPAs vermarktet. Im Texas-Einzelhandelsmarkt baut Vistra seine Kundenbasis unter dem TXU-Brand aus. Ziel: 25 GW installierte Kapazität mit deutlich niedrigerem CO2-Fußabdruck bis 2027.',
+        scenarios: {
+          bull: { pct: 30, text: 'ERCOT-Strompreise steigen durch AI-Nachfrage auf $60+/MWh. Hyperscaler-PPA mit Comanche Peak abgeschlossen. Aktie auf $195+.' },
+          base: { pct: 45, text: 'FCF-Wachstum 15–20% p.a. durch höhere Strompreise. Rückkaufprogramm $1 Mrd.+ p.a. DCF-Ziel $160 → +23% Upside.' },
+          bear: { pct: 25, text: 'ERCOT reguliert Großhandelspreise, Kohle-Ausstieg teurer als erwartet → -25% Downside.' },
+        },
+        summary: {
+          emoji: '⚡', text: 'Vistra ist der spannendste Wachstumswert im Energie-Sektor: Als größter unabhängiger Stromproduzent in Texas profitiert VST direkt von der explodierten Stromnachfrage durch KI-Rechenzentren. Comanche Peak (2 GW Kernkraft) ist eine hochwertige Baseload-Anlage für Hyperscaler-PPAs. Mit 3,6x EV/Revenue und 20% Umsatzwachstum ist Vistra attraktiv bewertet — der höchste DCF-Upside (+23%) im heutigen Peer-Set.',
+          borderColor: '#ef4444', bgColor: '#fff5f5',
+        },
+      },
+    ],
+  },
+
+  finanzen: {
+    name: 'Finanzen — Zahlungsverkehr, Ratings & Asset Management',
+    lastUpdated: '18. Juni 2026',
+    hero: {
+      eyebrow: 'Sektor: Finanzen',
+      title: 'Wo liegen die besten<br/>Long-Ideen in Finanzen?',
+      sub: 'Fünf führende Unternehmen aus Zahlungsverkehr, Kredit-Ratings und alternativem Asset Management — von Zahlungsnetzwerk-Duopolisten über Ratings-Monopolisten bis zu alternativen Asset Managern mit Rekord-AUM. Autonome Tagesanalyse vom 18. Juni 2026.',
+      heroClass: '',
+      stats: [
+        { val: '$28 Bio.', label: 'Globaler Finanzdienstleistungsmarkt' },
+        { val: '8–12% p.a.', label: 'Wachstum Digitaler Zahlungen' },
+        { val: '5', label: 'Analysierte Aktien' },
+        { val: '18. Juni 2026', label: 'Datenstand der Analyse' },
+      ],
+    },
+    marketTitle: 'Der Finanz-Markt auf einen Blick',
+    marketDesc: 'Digitale Zahlungen, Kapitalmarkt-Boom und Private Credit als strukturelle Treiber',
+    marketTiles: [
+      { label: 'Globales Zahlungsvolumen 2026', val: '$150 Bio.', sub: 'Digitale Zahlungen wachsen 15% p.a. — Bargeldersatz und E-Commerce treiben Visa & Mastercard' },
+      { label: 'Private Credit AUM global', val: '$2,5 Bio.', sub: 'Alternative Asset Manager wie Blackstone dominieren das schnellst wachsende Segment' },
+      { label: 'Fintech-Markt CAGR bis 2030', val: '16% p.a.', sub: 'Embedded Finance, Open Banking und KI-Kreditvergabe transformieren traditionelle Finanzdienstleistungen' },
+      { label: 'Anleihen-Neuemissionen 2026E', val: '$12 Bio.', sub: 'Refinanzierungswelle treibt Ratings-Volumen bei Moody\'s und S&P Global — struktureller Rückenwind' },
+    ],
+    helpText: '<strong>Wie lese ich dieses Dashboard?</strong> Der Finanz-Sektor ist heterogen: Zahlungsnetzwerke, Kredit-Ratings und Asset Manager haben unterschiedliche Risikoprofile. Zahlungsnetzwerke (Visa, Mastercard) haben die stärksten Burggräben — nahezu unmöglich zu replizieren. Bewertung: EV/Revenue ist bei Finanzdienstleistern unterschiedlich zu interpretieren. <strong>Klicke auf eine Aktie</strong> für die ausführliche Analyse.',
+    stockTableHeaders: ['Unternehmen', 'Wachstum', 'Unternehmensgröße', 'Preis der Aktie', 'Effizienz', 'Wettb.-vorteil', 'Einschätzung'],
+    stocks: [
+      {
+        ticker: 'BX', name: 'Blackstone', fullName: 'Blackstone Inc.',
+        exchange: 'NYSE', color: '#3b82f6', lightBg: '#dbeafe', darkText: '#1e40af',
+        marketCap: 175, revenue: 14.5, growth: 20, grossMargin: 62, fcfMargin: 40,
+        ev: 180, evRev: 12.4, ruleOf40: 60, nrr: 'N/A', moat: 4,
+        verdict: 'Alts-Marktführer', verdictColor: '#3b82f6', verdictBg: '#dbeafe', priceLabel: 'Fair',
+        dcf: null,
+        thesis: { position: 'Long', conviction: 3, horizon: '2–3 Jahre', note: 'Blackstone verwaltet $1,2 Bio. AUM und wächst durch Private Credit, Real Estate Debt und Infrastructure. Wachstumsmarkt Private Credit ist strukturell langfristig mit stabilen Managementgebühren.' },
+        what: 'Blackstone ist der weltgrößte Alternative Asset Manager mit $1,2 Bio. AUM in Private Equity, Real Estate, Credit und Infrastruktur. Der Trend zu Alternatives — weg von illiquiden Bonds hin zu Private Credit — treibt strukturelles AUM-Wachstum.',
+        bull: 'Private Credit ist die am schnellsten wachsende Assetklasse: Institutionelle und zunehmend Retailanleger allokieren um. AUM-Wachstum von 15–20% p.a. treibt stabile Managementgebühren. BREIT (Retail-Immobilienfonds) und BCRED öffnen den Massenmarkt.',
+        bear: 'Bewertung hängt von Kapitalmarktumfeld ab: Bei Kreditklemme oder Immobilienkorrektur steigen Abschreibungen. Managementgebühren sind stabil, Carried Interest jedoch zyklisch. Regulierung von Private Credit wächst.',
+        radarScores: [100, 60, 62, 65, 80],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 2, explain: 'Reputations-Netzwerkeffekte: Die stärkste Brand in Alternatives zieht LP-Kapital und Deal-Flow an — selbstverstärkend' },
+          { name: 'Wechselhürden', score: 2, explain: 'LPs committen Kapital für 7–10 Jahre. Wechsel zu anderen Managern ist aufwendig und mit Reputationsrisiko verbunden' },
+          { name: 'Skalenvorteile', score: 3, explain: '$1,2 Bio. AUM generiert Infrastruktur und Zugang zu Deals, die kleinere Manager nicht replizieren können' },
+          { name: 'KI / Datenvorteil', score: 1, explain: 'Proprietäre Deal-Datenbank und Sektorexpertise aus 30+ Jahren als schwer quantifizierbarer, aber echter Vorteil' },
+        ],
+        strategy: 'Blackstone verfolgt eine Dreistrategie: (1) Institutionelles Kapital in Flaggschiff-Fonds (Buyout, Real Estate Core+, Credit) weiter aufnehmen. (2) Retail-Zugang durch BREIT, BCRED und BIP für das $80 Bio. Privatanleger-Segment. (3) Infrastruktur und Versicherungskapital als neue Wachstumsfelder erschließen. Ziel: $1 Bio. AUM allein in Credit bis 2030.',
+        scenarios: {
+          bull: { pct: 30, text: 'Zinswende treibt Realisierungen und Fundraising-Boom: AUM auf $1,8 Bio. bis 2028, Aktie auf $250+.' },
+          base: { pct: 45, text: 'Solides AUM-Wachstum 15% p.a., stabiles Private Credit-Umfeld, Distributable EPS wächst 15% → 12% p.a. Rendite.' },
+          bear: { pct: 25, text: 'Kreditklemme und Immobilienwerte unter Druck: Realisierungen eingefroren, Fundraising stockt → -25% Downside.' },
+        },
+        summary: {
+          emoji: '🏦', text: 'Blackstone ist der überzeugendste strukturelle Nutznießer des Trends zu Alternatives. Mit $1,2 Bio. AUM und 15–20% Wachstum in Private Credit und Real Estate Debt ist BX in einem der am stärksten wachsenden Segmente des globalen Finanzmarkts. 12,4x EV/Revenue ist für die Qualität des Geschäfts fair — kein Schnäppchen, aber ein struktureller Compounder.',
+          borderColor: '#3b82f6', bgColor: '#eff6ff',
+        },
+      },
+      {
+        ticker: 'MA', name: 'Mastercard', fullName: 'Mastercard Incorporated',
+        exchange: 'NYSE', color: '#8b5cf6', lightBg: '#ede9fe', darkText: '#5b21b6',
+        marketCap: 490, revenue: 31.5, growth: 12, grossMargin: 76, fcfMargin: 45,
+        ev: 500, evRev: 15.9, ruleOf40: 57, nrr: 'N/A', moat: 5,
+        verdict: 'Zahlungs-Duopolist', verdictColor: '#8b5cf6', verdictBg: '#ede9fe', priceLabel: 'Teuer',
+        dcf: { recommendation: 'HOLD', target: 620, upside: 12.0, currentPrice: 555, bear: -18, bull: 30 },
+        thesis: { position: 'Long', conviction: 4, horizon: '3–5 Jahre', note: 'Mastercard ist die zweitstärkste Zahlungsinfrastruktur der Welt. Value-Added Services wachsen 25% YoY. Das Netzwerk aus 3,4 Mrd. Karten und 130 Mio. Akzeptanzstellen ist das stärkste Netzwerkeffektgeschäft im Finanzsektor.' },
+        what: 'Mastercard betreibt eines der zwei globalen Zahlungsnetzwerke. Mit 3,4 Mrd. Karten und 130 Mio. Akzeptanzstellen nimmt Mastercard eine Gebühr auf jeden Zahlungsvorgang. Kein Kreditrisiko — nur das Netzwerk.',
+        bull: 'Value-Added Services wachsen 25% YoY und sind höhermargig als Core-Payments. Noch 50% aller Zahlungen in entwickelten Märkten sind Bargeld — struktureller Rückenwind für Digitalisierung. Grenzüberschreitende Transaktionen (Cross-Border) mit 40%+ Marge wachsen überproportional.',
+        bear: 'Real-Time-Payments (FedNow in USA, UPI in Indien) bedrohen langfristig das Kartenmodell. Regulierungsdruck auf Interchange-Fees in EU und Australien. Wettbewerb durch PayPal/Apple Pay in der Checkout-Layer.',
+        radarScores: [60, 57, 76, 50, 100],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 3, explain: 'Mehr Karten → mehr Händler → mehr Karten: Der klassischste Netzwerkeffekt im Finanzsektor — 3,4 Mrd. Karten × 130 Mio. Akzeptanzstellen' },
+          { name: 'Wechselhürden', score: 2, explain: 'Banken-Issuer-Verträge laufen mehrere Jahre. Wechsel von Mastercard zu Visa kostet Banken erhebliche Rebate-Verluste und operative Komplexität' },
+          { name: 'Skalenvorteile', score: 3, explain: 'Die Netzwerkinfrastruktur kostet fast nichts je zusätzliche Transaktion — nahezu reine Software-Skaleneffekte' },
+          { name: 'KI / Datenvorteil', score: 2, explain: 'Echtzeit-Betrugsprävention mit KI über Mrd. von Transaktionen ist eine nahezu unlizenzierbare Kernkompetenz' },
+        ],
+        strategy: 'Mastercard verfolgt eine Dreistrategie: (1) Core Payments: Kartentransaktionen und Cross-Border-Volumen weiterwachsen. (2) Value-Added Services: Cybersecurity, Open Banking, KI-basierte Insights — höhermargige Wachstumssäule. (3) New Payment Flows: B2B-Zahlungen ($125 Bio. TAM), Government Disbursements und Real-Time-Payments als Erweiterung des Netzwerks.',
+        scenarios: {
+          bull: { pct: 30, text: 'Value-Added Services beschleunigen auf 30% Wachstum, Cross-Border erholt sich vollständig. EV/Rev auf 20x → Aktie auf $750.' },
+          base: { pct: 45, text: 'Solides Wachstum 10–12% p.a., Value-Added Services 20–25%, EV/Rev stabil bei 15–16x → DCF-Ziel $620 (+12%).' },
+          bear: { pct: 25, text: 'RTP/FedNow gewinnt Marktanteile, EU-Regulierung auf Interchange verschärft sich → EV/Rev auf 11x, -18% Downside.' },
+        },
+        summary: {
+          emoji: '💳', text: 'Mastercard ist das zweite der zwei globalen Zahlungsduopole — ein Netzwerkeffektgeschäft ohne Kreditrisiko. Mit 3,4 Mrd. Karten, 76% Bruttomarge und 45% FCF-Marge ist die Kapitalallokation unübertrefflich. 15,9x EV/Revenue ist die faire Prämie für ein Quasi-Monopol im globalen Zahlungsverkehr.',
+          borderColor: '#8b5cf6', bgColor: '#f5f3ff',
+        },
+      },
+      {
+        ticker: 'MCO', name: "Moody's", fullName: "Moody's Corporation",
+        exchange: 'NYSE', color: '#10b981', lightBg: '#d1fae5', darkText: '#065f46',
+        marketCap: 80, revenue: 8.5, growth: 10, grossMargin: 70, fcfMargin: 28,
+        ev: 87, evRev: 10.2, ruleOf40: 38, nrr: 'N/A', moat: 5,
+        verdict: 'Ratings-Duopolist', verdictColor: '#10b981', verdictBg: '#d1fae5', priceLabel: 'Fair',
+        dcf: { recommendation: 'BUY', target: 490, upside: 14.0, currentPrice: 430, bear: -15, bull: 28 },
+        thesis: { position: 'Long', conviction: 4, horizon: '2–3 Jahre', note: "Moody's Ratings sind faktisch regulatorisch vorgeschrieben. Die Refinanzierungswelle 2026–2028 treibt Ratings-Volumen strukturell. Moody's Analytics wächst 15%+ und ist ein SaaS-ähnliches Geschäft mit hohen Wechselhürden." },
+        what: "Moody's ist neben S&P Global das einzige globale Kredit-Rating-Duopol. Jede Anleihe braucht ein MCO-Rating, bevor institutionelle Investoren sie kaufen dürfen. Daneben betreibt Moody's Analytics ein schnell wachsendes Daten/SaaS-Geschäft.",
+        bull: "Refinanzierungswelle 2026–2028: Mehr als $12 Bio. Unternehmensanleihen müssen refinanziert werden — struktureller Ratings-Boom. Moody's Analytics wächst 15%+ mit SaaS-ähnlichem ARR und hohen Wechselhürden.",
+        bear: 'Konzentration auf Kapitalmarktzyklen: Bei Kreditklemme bricht Ratings-Volumen ein. EU-Regulierung forciert Wettbewerb. Rating-Manipulationsrisiken sind historisch mit Strafzahlungen verbunden.',
+        radarScores: [50, 38, 70, 78, 100],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 2, explain: 'Mehr Ratings-Kunden → mehr Daten → bessere Modelle → mehr Akzeptanz: Schleichender aber echter Netzwerkeffekt' },
+          { name: 'Wechselhürden', score: 3, explain: 'Investoren-mandatierte Ratings: Regulatorisch vorgeschrieben für viele Käufer. MCO-Rating ist kein optionales Feature' },
+          { name: 'Skalenvorteile', score: 3, explain: 'Duopol-Position bedeutet: Wer eine Anleihe ratet, braucht faktisch das MCO- oder SPGI-Rating — Dritte kommen nicht rein' },
+          { name: 'KI / Datenvorteil', score: 2, explain: 'MCO Analytics hat 50+ Jahre Kreditdaten — die Basis für KI-gestützte Kreditmodelle und ESG-Analyse' },
+        ],
+        strategy: "Moody's verfolgt eine Zweiträgerstrategie: (1) MIS (Ratings): Zyklisches Kerngeschäft, das von Anleiheemissionsvolumen abhängt. (2) MA (Analytics): Schnell wachsendes SaaS-Segment mit CRE-, ESG- und KI-Analyse-Tools. Ziel: MA-Anteil am Gesamtumsatz von heute 45% auf >55% bis 2028 erhöhen.",
+        scenarios: {
+          bull: { pct: 25, text: "Refinanzierungswelle treibt MIS-Volumen. MA wächst 20%+. EV/Rev expandiert auf 13x → Aktie $560+." },
+          base: { pct: 50, text: "Stabiles Anleihenvolumen, MA wächst 15%: DCF-Ziel $490 (+14%), EV/Rev bei 10–11x — faire Bewertung für Duopol." },
+          bear: { pct: 25, text: 'Kreditklemme bricht Emissionsvolumen ein: MIS-Einnahmen fallen 25%, EV/Rev auf 7x → -15% Downside.' },
+        },
+        summary: {
+          emoji: '📊', text: "Moody's ist das günstigste Duopol im Finanzsektor — 10,2x EV/Revenue für ein Unternehmen, das faktisch die einzige Alternative zur SPGI ist. Mit der Refinanzierungswelle 2026–2028 hat MCO strukturellen Rückenwind. Moody's Analytics wächst 15%+ und entkoppelt MCO zunehmend von der Zyklizität des Ratings-Marktes.",
+          borderColor: '#10b981', bgColor: '#f0fdf4',
+        },
+      },
+      {
+        ticker: 'SPGI', name: 'S&P Global', fullName: 'S&P Global Inc.',
+        exchange: 'NYSE', color: '#f59e0b', lightBg: '#fef3c7', darkText: '#92400e',
+        marketCap: 130, revenue: 15.6, growth: 10, grossMargin: 68, fcfMargin: 35,
+        ev: 140, evRev: 9.0, ruleOf40: 45, nrr: 'N/A', moat: 4,
+        verdict: 'Data-Monopolist', verdictColor: '#f59e0b', verdictBg: '#fef3c7', priceLabel: 'Günstig',
+        dcf: { recommendation: 'BUY', target: 590, upside: 11.3, currentPrice: 530, bear: -15, bull: 28 },
+        thesis: { position: 'Long', conviction: 4, horizon: '2–3 Jahre', note: 'S&P Global ist nach der IHS Markit-Integration ein diversifiziertes Daten/Analytics-Unternehmen. Ratings, Indices (S&P 500-Lizenzen) und Commodity Insights (Platts) machen >70% der Revenues wiederkehrend. 9x EV/Revenue ist günstig für diese Qualität.' },
+        what: 'S&P Global betreibt das weltbekannteste Aktienindex-Franchise (S&P 500), das zweitgrößte Kredit-Rating-Geschäft der Welt und führende Marktdaten-Plattformen (Platts Commodities, Market Intelligence). Der S&P 500 allein generiert Milliarden an lizenzierten ETF-Gebühren jährlich.',
+        bull: 'S&P 500-Index-Lizenzen wachsen mit ETF-AUM: $10+ Bio. passiv investiertes Kapital zahlt SPGI Lizenzgebühren — automatisch wachsend. Platts Commodity Insights profitiert von Energie-Volatilität und ESG-Datenbedarf. Ratings erholen sich mit Anleihenvolumen.',
+        bear: 'MSCI konkurriert im Index-Geschäft zunehmend aggressiv. Bloomberg könnte in Market Intelligence weiterwachsen. Post-Merger-Synergien sind eingepreist — was ist der nächste Wachstumskatalyst?',
+        radarScores: [50, 45, 68, 89, 80],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 2, explain: 'Der S&P 500 ist der globale Standard für Kapitalmarktreferenz — je mehr Geld benchmarkt, desto unverzichtbarer das Franchise' },
+          { name: 'Wechselhürden', score: 3, explain: 'Tausende ETFs, Fonds und Derivate sind auf SPGI-Indizes lizenziert — ein Wechsel würde Milliarden an Rebalancing erfordern' },
+          { name: 'Skalenvorteile', score: 3, explain: 'Index-Lizenzen und Ratings wachsen ohne proportionale Kostenerhöhung — nahezu reine Skalenvorteile auf der Margin-Seite' },
+          { name: 'KI / Datenvorteil', score: 2, explain: 'S&P Capital IQ und Platts sind Industriestandard-Datenquellen — KI-Layer auf historischen Daten erzeugt tiefe Analysevorsprünge' },
+        ],
+        strategy: 'S&P Global verfolgt eine Integrated Data & Analytics-Strategie: Die vier Divisionen (Ratings, Market Intelligence, Commodity Insights, Indices) generieren durch gegenseitige Datenweitergabe Netzwerkeffekte innerhalb des SPGI-Ökosystems. Post-IHS Markit: Cross-Selling und Datenintegration sind der primäre Hebel für Margenerweiterung bis 2027.',
+        scenarios: {
+          bull: { pct: 25, text: 'ETF-AUM wächst auf $25 Bio.+ weltweit, Platts ESG-Daten als neues Wachstumssegment: EV/Rev auf 12x → Aktie $700+.' },
+          base: { pct: 50, text: 'Stabile Wachstumsdynamik 9–11% p.a., Margenexpansion durch Synergien. DCF-Ziel $590 (+11%), EV/Rev 9–10x.' },
+          bear: { pct: 25, text: 'Bloomberg gewinnt in Market Intelligence Marktanteile, Ratings-Volumen bricht ein → EV/Rev auf 6x, -15% Downside.' },
+        },
+        summary: {
+          emoji: '📈', text: 'S&P Global ist das günstigste Premium-Franchise im Finanz-Sektor: 9,0x EV/Revenue für das Unternehmen, das den S&P 500-Index besitzt, das zweitgrößte Ratings-Duopol betreibt und das wichtigste Commodity-Daten-Franchise (Platts) hält. 35% FCF-Marge bei 10% Wachstum macht SPGI zum Value-Long im Finanz-Sektor.',
+          borderColor: '#f59e0b', bgColor: '#fffbeb',
+        },
+      },
+      {
+        ticker: 'V', name: 'Visa', fullName: 'Visa Inc.',
+        exchange: 'NYSE', color: '#ef4444', lightBg: '#fee2e2', darkText: '#991b1b',
+        marketCap: 630, revenue: 44.0, growth: 16, grossMargin: 80, fcfMargin: 52,
+        ev: 640, evRev: 14.5, ruleOf40: 68, nrr: 'N/A', moat: 5,
+        verdict: '★ Top-Pick', verdictColor: '#ef4444', verdictBg: '#fee2e2', priceLabel: 'Fair',
+        dcf: { recommendation: 'BUY', target: 345, upside: 17.0, currentPrice: 295, bear: -15, bull: 35 },
+        thesis: { position: 'Long', conviction: 5, horizon: '3–5 Jahre', note: '★ Top-Pick des Tages. Visa ist das stärkste Zahlungsnetzwerk der Welt: 4,9 Mrd. Karten, 150 Mio. Händler, 80% Bruttomarge, 52% FCF-Marge — und trotzdem 16% Wachstum. Das Netzwerk ist faktisch nicht replizierbar. Kein Kreditrisiko — nur Gebühren auf jeden Zahlungsvorgang.' },
+        what: 'Visa betreibt das weltgrößte Zahlungsnetzwerk: 4,9 Mrd. Karten, 150 Mio. Händler in 200+ Ländern. Visa trägt kein Kreditrisiko — nur das Netz. Bei jeder Transaktion nimmt Visa eine Gebühr. Die Infrastruktur kann von niemandem nachgebaut werden.',
+        bull: 'Digitalisierung des globalen Zahlungsverkehrs: Noch 50% der globalen Transaktionen sind bar — jede Umstellung generiert neue Visa-Gebühren. Cross-Border (40%+ Marge) profitiert von globalem Reise-Boom. Tap-to-Pay und Tokenisierung erhöhen Transaktionsfrequenz.',
+        bear: 'Central Bank Digital Currencies (CBDCs) könnten Visa-Netzwerk umgehen. Real-Time-Payments (FedNow, UPI) sind direkte Konkurrenz ohne Interchange. Regulatorisches Risiko auf Interchange-Fees in der EU und USA.',
+        radarScores: [80, 68, 80, 55, 100],
+        moatDetails: [
+          { name: 'Netzwerkeffekte', score: 3, explain: '4,9 Mrd. Karten × 150 Mio. Händler: Der stärkste beidseitige Netzwerkeffekt im globalen Finanzwesen — selbstverstärkend und nicht replizierbar' },
+          { name: 'Wechselhürden', score: 3, explain: 'Banken-Issuer-Verträge, Händler-Terminals und Konsumenten-Gewohnheiten — ein Wechsel auf andere Netzwerke dauert Jahre und kostet Milliarden' },
+          { name: 'Skalenvorteile', score: 3, explain: 'Nahezu null Grenzkosten je zusätzlicher Transaktion: 4,9 Mrd. Karten generieren Revenue ohne proportionale Kostensteigerung' },
+          { name: 'KI / Datenvorteil', score: 2, explain: 'Echtzeit-Betrugsprävention auf Mrd. von täglichen Transaktionen ist eine KI-Kernkompetenz, die Wettbewerber nicht replizieren können' },
+        ],
+        strategy: 'Visa verfolgt eine Network of Networks-Strategie: (1) Core Credentials: Die 4,9 Mrd. Karten weiter ausbauen — in Emerging Markets und bei neuen Verticals. (2) New Flows: B2B-Zahlungen, A2A-Transfers und Government-Disbursements erschließen. (3) Value-Added Services: Cybersecurity, Open Banking und Data Analytics als neue Einnahmequellen (heute 20%+ des Umsatzes, wächst 25% p.a.).',
+        scenarios: {
+          bull: { pct: 30, text: 'B2B-Zahlungen und Emerging Markets beschleunigen: Wachstum auf 20%+, FCF-Marge 55%, EV/Rev auf 18x → Aktie $400+.' },
+          base: { pct: 45, text: 'Stabile digitale Zahlungsinfrastruktur: 15–17% Wachstum, FCF-Marge 52%. DCF-Ziel $345 (+17%).' },
+          bear: { pct: 25, text: 'CBDC/RTP-Adoption beschleunigt, EU-Interchange-Deckel: Wachstum fällt auf 8%, EV/Rev auf 10x → -15% Downside.' },
+        },
+        summary: {
+          emoji: '💰', text: 'Visa ist der Top-Pick im Finanzen-Sektor: 4,9 Mrd. Karten, 150 Mio. Händler, 80% Bruttomarge, 52% FCF-Marge — und 16% Wachstum. Das Zahlungsnetzwerk ist das stärkste Netzwerkeffektgeschäft der Welt und faktisch unmöglich zu replizieren. 14,5x EV/Revenue ist die günstigste Einstiegsgelegenheit in ein globales Infrastruktur-Monopol.',
+          borderColor: '#ef4444', bgColor: '#fff5f5',
+        },
+      },
+    ],
+  },
+
+};
+
+/* ═══════════════════════════════════════════════════════
+   STATE & HELPERS
+═══════════════════════════════════════════════════════ */
+let currentSector = 'finanzen';
+let radarChart = null;
+
+function getSector() { return SECTORS[currentSector]; }
+function getStocks() { return getSector().stocks; }
+
+function fmtMktCap(val) {
+  if (val >= 1000) return '$' + (val / 1000).toFixed(2) + ' Bio.';
+  return '$' + val.toFixed(0) + ' Mrd.';
+}
+
+function priceBadgeCls(ev) {
+  if (ev <= 10) return 'badge-green';
+  if (ev <= 15) return 'badge-amber';
+  return 'badge-red';
+}
+function priceText(ev) {
+  if (ev <= 10) return 'Günstig';
+  if (ev <= 15) return 'Fair';
+  if (ev <= 22) return 'Teuer';
+  return 'Sehr teuer';
+}
+function growthCls(g) { return g >= 25 ? 'badge-green' : 'badge-amber'; }
+
+function starsHTML(n, sz = 14) {
+  let s = '';
+  for (let i = 1; i <= 5; i++)
+    s += `<span class="star ${i <= n ? 'filled' : 'empty'}" style="font-size:${sz}px">★</span>`;
+  return `<div class="stars">${s}</div>`;
+}
+
+function dotsHTML(score) {
+  let d = '';
+  for (let i = 1; i <= 3; i++)
+    d += `<div class="moat-dot ${i <= score ? 'on' : ''}"></div>`;
+  return `<div class="moat-dots">${d}</div>`;
+}
+
+function getMaxMarketCap(stocks) {
+  return Math.max(...stocks.map(s => s.marketCap));
+}
+
+/* ═══════════════════════════════════════════════════════
+   DRAWER
+═══════════════════════════════════════════════════════ */
+function openDrawer(ticker) {
+  const stocks = getStocks();
+  const s = stocks.find(x => x.ticker === ticker);
+  if (!s) return;
+
+  document.getElementById('drawerIcon').style.background = s.lightBg;
+  document.getElementById('drawerIcon').style.color = s.darkText;
+  document.getElementById('drawerIcon').textContent = s.ticker;
+  document.getElementById('drawerName').textContent = s.name;
+  document.getElementById('drawerSub').textContent = `${s.exchange}: ${s.ticker} · ${s.verdict}`;
+
+  const pLabel = priceText(s.evRev);
+  const pCls   = priceBadgeCls(s.evRev);
+  const mktLabel = fmtMktCap(s.marketCap);
+
+  document.getElementById('drawerBody').innerHTML = `
+
+    <!-- KPIs -->
+    <div class="d-section">
+      <div class="d-section-title">Finanzkennzahlen (Stand: Juni 2026)</div>
+      <div class="kpi-grid">
+        <div class="kpi-box">
+          <div class="kpi-label">Jahresumsatz</div>
+          <div class="kpi-val" style="color:${s.color}">$${s.revenue} Mrd.</div>
+          <div class="kpi-sub">Letzten 12 Monate</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Umsatzwachstum</div>
+          <div class="kpi-val" style="color:${s.growth >= 25 ? '#10b981' : '#f59e0b'}">+${s.growth}%</div>
+          <div class="kpi-sub">Im Vergleich zum Vorjahr</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Gewinnmarge (brutto)</div>
+          <div class="kpi-val">${s.grossMargin}%</div>
+          <div class="kpi-sub">Vom Umsatz verbleibt nach direkten Kosten</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Cashflow-Marge</div>
+          <div class="kpi-val" style="color:${s.fcfMargin >= 25 ? '#10b981' : '#f59e0b'}">${s.fcfMargin}%</div>
+          <div class="kpi-sub">Tatsächlich verdientes Geld (FCF)</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Unternehmenswert</div>
+          <div class="kpi-val">${mktLabel}</div>
+          <div class="kpi-sub">Marktkapitalisierung (Enterprise Value)</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Preis-Umsatz (EV/Rev)</div>
+          <div class="kpi-val"><span class="badge ${pCls}">${pLabel} · ${s.evRev}×</span></div>
+          <div class="kpi-sub">Niedrig = günstig, hoch = teuer</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Effizienz-Score</div>
+          <div class="kpi-val" style="color:${s.ruleOf40 >= 60 ? '#10b981' : '#f59e0b'}">${s.ruleOf40} / 100</div>
+          <div class="kpi-sub">Rule of 40 — über 60 ist exzellent</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Kundentreue (NRR)</div>
+          <div class="kpi-val" style="color:#10b981">${s.nrr}</div>
+          <div class="kpi-sub">Bestehende Kunden kaufen mehr dazu</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wettbewerbsvorteil -->
+    <div class="d-section">
+      <div class="d-section-title">Wettbewerbsvorteil im Detail</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        ${starsHTML(s.moat, 18)}
+        <span style="font-size:13px;color:var(--text-muted)">${['','Schwach','Niedrig','Mittel','Stark','Sehr stark'][s.moat]} Burggraben</span>
+      </div>
+      <div class="moat-row">
+        ${s.moatDetails.map(m => `
+          <div>
+            <div class="moat-item">
+              <span class="moat-name">${m.name}</span>
+              ${dotsHTML(m.score)}
+            </div>
+            <div class="moat-explain">${m.explain}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- Strategie -->
+    <div class="d-section">
+      <div class="d-section-title">Wohin will das Unternehmen?</div>
+      <p style="font-size:14px;line-height:1.75;color:var(--text-muted)">${s.strategy}</p>
+    </div>
+
+    <!-- Szenarien -->
+    <div class="d-section">
+      <div class="d-section-title">Was könnte passieren? (3 Szenarien)</div>
+      <div class="scenario-row">
+        <div class="scenario-box scenario-bull">
+          <div class="scenario-label">↑ Bestes Szenario</div>
+          <div class="scenario-pct">${s.scenarios.bull.pct}%</div>
+          <div class="scenario-text">${s.scenarios.bull.text}</div>
+        </div>
+        <div class="scenario-box scenario-base">
+          <div class="scenario-label">→ Normaler Verlauf</div>
+          <div class="scenario-pct">${s.scenarios.base.pct}%</div>
+          <div class="scenario-text">${s.scenarios.base.text}</div>
+        </div>
+        <div class="scenario-box scenario-bear">
+          <div class="scenario-label">↓ Schlechtestes Szenario</div>
+          <div class="scenario-pct">${s.scenarios.bear.pct}%</div>
+          <div class="scenario-text">${s.scenarios.bear.text}</div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--text-light);margin-top:6px">
+        Die Prozentzahlen zeigen die geschätzte Wahrscheinlichkeit des jeweiligen Szenarios.
+      </p>
+    </div>
+
+    <!-- DCF Bewertung / Investment-These -->
+    ${(s.dcf || s.thesis) ? (() => {
+      const d = s.dcf;
+      const t = s.thesis;
+      const convStars = t ? '★'.repeat(t.conviction) + '☆'.repeat(5 - t.conviction) : '';
+      const thesisBox = t ? `
+      <div class="summary-box" style="background:#d1fae5;border-left-color:#10b981;margin-bottom:10px">
+        <div class="summary-headline" style="color:#065f46">
+          ✅ Investment-These (Schritt 6): ${t.position} · ${convStars} · Horizont ${t.horizon}
+        </div>
+        <div class="summary-text" style="color:#064e3b">${t.note}</div>
+      </div>` : '';
+      if (!d) return `
+    <div class="d-section">
+      <div class="d-section-title">Investment-These (Schritt 6)</div>
+      ${thesisBox}
+      <p class="dcf-disclaimer">Investment-These aus Schritt 6 des Workflow. DCF-Modell für diesen Sektor nicht als Kurs-Kursziel verfügbar. Kein Investment-Advice.</p>
+    </div>`;
+      const upStr  = d.upside > 0 ? '+' + d.upside.toFixed(1) + '%' : d.upside.toFixed(1) + '%';
+      const bullStr = d.bull != null ? (d.bull > 0 ? '+' + d.bull.toFixed(1) + '%' : d.bull.toFixed(1) + '%') : 'n/a';
+      const bearStr = d.bear != null ? (d.bear > 0 ? '+' + d.bear.toFixed(1) + '%' : d.bear.toFixed(1) + '%') : 'n/a';
+      const dcfBg = d.recommendation === 'BUY' ? '#d1fae5' : '#fee2e2';
+      const dcfBorder = d.recommendation === 'BUY' ? '#10b981' : '#ef4444';
+      const dcfHeadColor = d.recommendation === 'BUY' ? '#065f46' : '#991b1b';
+      const dcfTextColor = d.recommendation === 'BUY' ? '#064e3b' : '#7f1d1d';
+      const dcfIcon = d.recommendation === 'BUY' ? '✅' : '⚠️';
+      return `
+    <div class="d-section">
+      <div class="d-section-title">DCF-Bewertungsmodell vs. Investment-These (Schritte 5 & 6)</div>
+
+      <!-- DCF box -->
+      <div class="summary-box" style="background:${dcfBg};border-left-color:${dcfBorder};margin-bottom:10px">
+        <div class="summary-headline" style="color:${dcfHeadColor}">
+          ${dcfIcon} DCF-Modell: ${d.recommendation} · Kursziel $${d.target.toFixed(2)}
+        </div>
+        <div class="summary-text" style="color:${dcfTextColor}">
+          Aktueller Kurs: <strong>$${d.currentPrice}</strong> · Base-Upside: <strong>${upStr}</strong><br/>
+          Der 5-Jahres-DCF ergibt einen intrinsischen Wert von $${d.target.toFixed(2)}.
+        </div>
+      </div>
+
+      <!-- Thesis box -->
+      ${thesisBox}
+
+      <!-- Erklärung (nur wenn SELL aber Long) -->
+      ${d.recommendation !== 'BUY' && t && t.position === 'Long' ? `
+      <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px">Warum DCF SELL und trotzdem Long?</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.65">
+          Der DCF berechnet den Wert auf Basis der nächsten 5 Jahre. Der Markt bewertet Wachstumsunternehmen aber auch für Wachstum <em>nach</em> Jahr 5. Die Investment-These sagt: Dieser Aufschlag ist gerechtfertigt.
+        </div>
+      </div>` : ''}
+
+      <!-- 3 Szenarien -->
+      <div class="dcf-grid">
+        <div class="dcf-box bear">
+          <div class="dcf-box-label">↓ Bear</div>
+          <div class="dcf-box-val">${bearStr}</div>
+          <div class="dcf-box-sub">Pessimistischer DCF</div>
+        </div>
+        <div class="dcf-box base">
+          <div class="dcf-box-label">→ Base</div>
+          <div class="dcf-box-val">${upStr}</div>
+          <div class="dcf-box-sub">Kursziel: $${d.target.toFixed(2)}</div>
+        </div>
+        <div class="dcf-box bull">
+          <div class="dcf-box-label">↑ Bull</div>
+          <div class="dcf-box-val">${bullStr}</div>
+          <div class="dcf-box-sub">Optimistischer DCF</div>
+        </div>
+      </div>
+      <p class="dcf-disclaimer">DCF-Modell basiert auf SEC-Filings (Juni 2026). Investment-These aus Schritt 6 des Workflow. Kein Investment-Advice.</p>
+    </div>`;
+    })() : ''}
+
+    <!-- Zusammenfassung -->
+    <div class="d-section">
+      <div class="d-section-title">Was bedeutet das für mich?</div>
+      <div class="summary-box" style="background:${s.summary.bgColor};border-left-color:${s.summary.borderColor}">
+        <div class="summary-headline" style="color:${s.summary.borderColor}">
+          ${s.summary.emoji} ${s.ticker} — Einfache Einschätzung
+        </div>
+        <div class="summary-text">${s.summary.text}</div>
+        <div class="summary-note">
+          Das ist keine Anlageberatung — sondern eine vereinfachte Einschätzung auf Basis der Analyse.
+          Aktien können stark schwanken. Investiere nur Geld, dessen Verlust du verkraften könntest.
+        </div>
+      </div>
+    </div>
+
+  `;
+
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+/* ═══════════════════════════════════════════════════════
+   RENDER COMPARE TABLE
+═══════════════════════════════════════════════════════ */
+function dcfBadgeHTML(s) {
+  const dcf = s.dcf;
+  const thesis = s.thesis;
+  if (!dcf && !thesis) return '<span style="font-size:12px;color:var(--text-light)">—</span>';
+  const convStars = thesis ? '★'.repeat(thesis.conviction) + '☆'.repeat(5 - thesis.conviction) : '';
+  const thesisPart = thesis
+    ? `<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+        <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;font-family:var(--mono)">${thesis.position}</span>
+        <span style="font-size:10px;color:var(--text-muted)">${convStars}</span>
+       </div>` : '';
+  if (!dcf) return thesisPart;
+  const upStr = dcf.upside > 0 ? '+' + dcf.upside.toFixed(1) + '%' : dcf.upside.toFixed(1) + '%';
+  const dcfColor = dcf.recommendation === 'BUY' ? '#065f46' : '#991b1b';
+  const dcfBg = dcf.recommendation === 'BUY' ? '#d1fae5' : '#fee2e2';
+  const dcfPart = `<span style="background:${dcfBg};color:${dcfColor};font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;font-family:var(--mono)">DCF: ${dcf.recommendation} ${upStr}</span>`;
+  return `<div style="display:flex;flex-direction:column;gap:4px">${dcfPart}${thesisPart}</div>`;
+}
+
+function renderCompareTable() {
+  const stocks = getStocks();
+  const hasAnalysis = stocks.some(s => s.dcf != null || s.thesis != null);
+  const thead = document.querySelector('#compareBody').closest('table').querySelector('thead tr');
+
+  // Sync header: add/remove These/DCF column
+  const existingDcfTh = thead.querySelector('.dcf-th');
+  if (hasAnalysis && !existingDcfTh) {
+    thead.insertAdjacentHTML('beforeend', '<th class="dcf-th">These / DCF</th>');
+  } else if (!hasAnalysis && existingDcfTh) {
+    existingDcfTh.remove();
+  }
+  const hasDcf = hasAnalysis;
+
+  const tbody = document.getElementById('compareBody');
+  tbody.innerHTML = '';
+  stocks.forEach(s => {
+    const pLabel = priceText(s.evRev);
+    const pCls   = priceBadgeCls(s.evRev);
+    const gCls   = growthCls(s.growth);
+    const mktLabel = fmtMktCap(s.marketCap);
+    const dcfCell = ''; // rendered separately below
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr onclick="openDrawer('${s.ticker}')">
+        <td>
+          <div class="ticker-cell">
+            <div class="ticker-dot" style="background:${s.lightBg};color:${s.darkText}">${s.ticker}</div>
+            <div>
+              <div class="stock-name">${s.name}</div>
+              <div class="stock-ticker">${s.exchange}: ${s.ticker}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="badge ${gCls}">+${s.growth}% p.a.</span></td>
+        <td><span class="num">${mktLabel}</span></td>
+        <td><span class="badge ${pCls}">${pLabel} (${s.evRev}×)</span></td>
+        <td><span class="num">${s.ruleOf40} / 100</span></td>
+        <td>${starsHTML(s.moat)}</td>
+        <td><span class="badge" style="background:${s.verdictBg};color:${s.darkText}">${s.verdict}</span></td>
+        ${hasDcf ? `<td>${dcfBadgeHTML(s)}</td>` : ''}
+      </tr>
+    `);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDER STOCK CARDS
+═══════════════════════════════════════════════════════ */
+function renderStockCards() {
+  const stocks = getStocks();
+  const maxMktCap = getMaxMarketCap(stocks);
+  const grid = document.getElementById('cardsGrid');
+  grid.innerHTML = '';
+  stocks.forEach(s => {
+    const growthPct = Math.min((s.growth / 60) * 100, 100);
+    const r40Pct    = Math.min((s.ruleOf40 / 120) * 100, 100);
+    const mktPct    = Math.min((s.marketCap / maxMktCap) * 100, 100);
+    const pLabel    = priceText(s.evRev);
+    const pCls      = priceBadgeCls(s.evRev);
+    const gCls      = growthCls(s.growth);
+    const mktLabel  = fmtMktCap(s.marketCap);
+
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="stock-card" onclick="openDrawer('${s.ticker}')">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-icon" style="background:${s.lightBg};color:${s.darkText}">${s.ticker}</div>
+            <div>
+              <div class="card-name">${s.name}</div>
+              <div class="card-full-name">${s.exchange}: ${s.ticker}</div>
+            </div>
+          </div>
+          <span class="verdict-badge" style="background:${s.verdictBg};color:${s.darkText}">
+            <span class="verdict-badge-dot" style="background:${s.color}"></span>
+            ${s.verdict}
+          </span>
+        </div>
+
+        <div class="card-body">
+          <div class="metric-row">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:3px">
+              <strong style="color:var(--text)">Was macht das Unternehmen?</strong>
+            </div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.5">${s.what}</div>
+          </div>
+
+          <div class="card-divider"></div>
+
+          <div class="metric-row">
+            <div class="metric-label-row">
+              <span class="metric-label">Wächst das Unternehmen?</span>
+              <span class="badge ${gCls}">+${s.growth}% p.a.</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${growthPct}%;background:${s.growth >= 25 ? '#10b981' : '#f59e0b'}"></div>
+            </div>
+            <span class="metric-hint">Umsatzwachstum — über 20% gilt als sehr gut</span>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-label-row">
+              <span class="metric-label">Ist die Aktie teuer?</span>
+              <span class="badge ${pCls}">${pLabel} (${s.evRev}×)</span>
+            </div>
+            <span class="metric-hint">Preis-Umsatz-Verhältnis — je niedriger, desto günstiger</span>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-label-row">
+              <span class="metric-label">Effizienz-Score</span>
+              <span class="metric-value">${s.ruleOf40} / 100</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${r40Pct}%;background:${s.ruleOf40 >= 60 ? '#10b981' : '#f59e0b'}"></div>
+            </div>
+            <span class="metric-hint">Über 40 = gesund, über 60 = exzellent</span>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-label-row">
+              <span class="metric-label">Wettbewerbsvorteil</span>
+              ${starsHTML(s.moat)}
+            </div>
+            <span class="metric-hint">Wie schwer ist es für Konkurrenten, dieses Unternehmen zu verdrängen?</span>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-label-row">
+              <span class="metric-label">Unternehmensgröße</span>
+              <span class="metric-value">${mktLabel}</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${mktPct}%;background:${s.color}"></div>
+            </div>
+            <span class="metric-hint">Marktkapitalisierung — Gesamtwert an der Börse</span>
+          </div>
+
+          <div class="card-divider"></div>
+
+          <div class="outlook-row">
+            <div class="outlook-box outlook-bull">
+              <div class="outlook-label">↑ Wenn es gut läuft</div>
+              <div class="outlook-text">${s.bull}</div>
+            </div>
+            <div class="outlook-box outlook-bear">
+              <div class="outlook-label">↓ Wenn es schlecht läuft</div>
+              <div class="outlook-text">${s.bear}</div>
+            </div>
+          </div>
+
+          ${(s.dcf || s.thesis) ? (() => {
+            const d = s.dcf;
+            const t = s.thesis;
+            const convStars = t ? '★'.repeat(t.conviction) + '☆'.repeat(5 - t.conviction) : '';
+            const thesisBadge = t ? `<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;font-family:var(--mono)">These: ${t.position}</span>
+              <span style="font-size:11px;color:var(--text-muted);font-family:var(--mono)">${convStars} · ${t.horizon}</span>
+            </div>` : '';
+            if (!d) return `
+          <div class="card-divider"></div>
+          <div class="dcf-banner" style="background:#f0fdf4;border-left:3px solid #10b981;flex-direction:column;align-items:flex-start;gap:6px">
+            ${thesisBadge}
+          </div>`;
+            const upStr = d.upside > 0 ? '+' + d.upside.toFixed(1) + '%' : d.upside.toFixed(1) + '%';
+            return `
+          <div class="card-divider"></div>
+          <div class="dcf-banner sell" style="flex-direction:column;align-items:flex-start;gap:6px">
+            <div style="display:flex;justify-content:space-between;width:100%">
+              <div class="dcf-rec">DCF: ${d.recommendation} · $${d.target.toFixed(2)}</div>
+              <div class="dcf-rec">${upStr}</div>
+            </div>
+            ${thesisBadge}
+          </div>`;
+          })() : ''}
+        </div>
+
+        <div class="card-click-hint">
+          Details & vollständige Analyse ansehen →
+        </div>
+      </div>
+    `);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDER MARKET TILES
+═══════════════════════════════════════════════════════ */
+function renderMarketTiles() {
+  const sector = getSector();
+  const tiles = document.getElementById('marketTiles');
+  tiles.innerHTML = '';
+  sector.marketTiles.forEach(t => {
+    tiles.insertAdjacentHTML('beforeend', `
+      <div class="market-tile">
+        <div class="market-tile-label">${t.label}</div>
+        <div class="market-tile-val">${t.val}</div>
+        <div class="market-tile-sub">${t.sub}</div>
+      </div>
+    `);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDER HERO
+═══════════════════════════════════════════════════════ */
+function renderHero() {
+  const sector = getSector();
+  const hero = sector.hero;
+
+  const heroSection = document.getElementById('heroSection');
+  heroSection.className = 'hero' + (hero.heroClass ? ' ' + hero.heroClass : '');
+
+  document.getElementById('heroEyebrow').textContent = hero.eyebrow;
+  document.getElementById('heroTitle').innerHTML = hero.title;
+  document.getElementById('heroSub').textContent = hero.sub;
+
+  const navBadge = document.getElementById('navBadge');
+  if (navBadge) {
+    navBadge.textContent = sector.lastUpdated ? `Stand: ${sector.lastUpdated}` : 'Stand: unbekannt';
+  }
+
+  const statsEl = document.getElementById('heroStats');
+  statsEl.innerHTML = '';
+  hero.stats.forEach(st => {
+    statsEl.insertAdjacentHTML('beforeend', `
+      <div class="hero-stat">
+        <div class="hero-stat-val">${st.val}</div>
+        <div class="hero-stat-label">${st.label}</div>
+      </div>
+    `);
+  });
+
+  document.getElementById('marketTitle').textContent = sector.marketTitle;
+  document.getElementById('marketDesc').textContent = sector.marketDesc;
+  document.getElementById('helpBox').innerHTML = '<p>' + sector.helpText + '</p>';
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDER RADAR CHART
+═══════════════════════════════════════════════════════ */
+function renderRadarChart() {
+  if (radarChart) radarChart.destroy();
+
+  const stocks = getStocks();
+  const radarLabels = ['Wachstum', 'Effizienz', 'Marge', 'Bewertung\n(günstig=gut)', 'Burggraben'];
+  const radarColors = ['#10b981','#ef4444','#3b82f6','#8b5cf6','#f59e0b'];
+
+  const datasets = stocks.map((s, i) => ({
+    label: s.ticker,
+    data: s.radarScores,
+    backgroundColor: radarColors[i] + '18',
+    borderColor: radarColors[i],
+    borderWidth: 2,
+    pointBackgroundColor: radarColors[i],
+    pointRadius: 4,
+    pointHoverRadius: 6,
+  }));
+
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  radarChart = new Chart(ctx, {
+    type: 'radar',
+    data: { labels: radarLabels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw} Punkte` } }
+      },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { display: false, stepSize: 25 },
+          grid: { color: '#e2e6f0' },
+          angleLines: { color: '#e2e6f0' },
+          pointLabels: { font: { family: "'Plus Jakarta Sans'", size: 12, weight: '600' }, color: '#374151' }
+        }
+      }
+    }
+  });
+
+  const legend = document.getElementById('chartLegend');
+  legend.innerHTML = '';
+  stocks.forEach((s, i) => {
+    legend.insertAdjacentHTML('beforeend', `
+      <div class="chart-legend-item" style="cursor:pointer" onclick="openDrawer('${s.ticker}')">
+        <div class="legend-swatch" style="background:${radarColors[i]}"></div>
+        <div>
+          <div class="legend-name">${s.ticker} — ${s.name}</div>
+          <div class="legend-desc">${s.verdict}</div>
+        </div>
+      </div>
+    `);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE SWITCHING (Sectors + Workflow)
+═══════════════════════════════════════════════════════ */
+function switchPage(pageKey) {
+  // Update tab styling
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.sector === pageKey);
+  });
+
+  const sectorContent = document.getElementById('sectorContent');
+  const workflowContent = document.getElementById('workflowContent');
+  const performanceContent = document.getElementById('performanceContent');
+  const weeklyContent = document.getElementById('weeklyContent');
+
+  // Erst alle vier Container ausblenden, danach gezielt einen einblenden
+  sectorContent.style.display = 'none';
+  workflowContent.style.display = 'none';
+  performanceContent.style.display = 'none';
+  weeklyContent.style.display = 'none';
+
+  if (pageKey === 'workflow') {
+    workflowContent.style.display = '';
+    currentSector = null;
+    renderWorkflowHero();
+  } else if (pageKey === 'performance') {
+    performanceContent.style.display = '';
+    currentSector = null;
+    renderPerformanceHero();
+    renderPerformanceTab();
+  } else if (pageKey === 'weekly') {
+    weeklyContent.style.display = '';
+    currentSector = null;
+    renderWeeklyHero();
+    renderWeeklyTab();
+  } else {
+    // Show sector page
+    sectorContent.style.display = '';
+    if (currentSector === pageKey) return;
+    currentSector = pageKey;
+    renderHero();
+    renderMarketTiles();
+    renderCompareTable();
+    renderStockCards();
+    renderRadarChart();
+  }
+}
+
+function renderPerformanceHero() {
+  const heroSection = document.getElementById('heroSection');
+  heroSection.className = 'hero';
+
+  document.getElementById('heroEyebrow').textContent = 'Performance-Tracking';
+  document.getElementById('heroTitle').innerHTML = 'Wie haben sich<br/>die Picks geschlagen?';
+  document.getElementById('heroSub').textContent =
+    'Jeder Top-Pick seit Start des Sektor-Radars, mit Einstiegskurs und aktueller Performance.';
+
+  const navBadge = document.getElementById('navBadge');
+  if (navBadge) navBadge.textContent = 'Laufend aktualisiert';
+
+  const statsEl = document.getElementById('heroStats');
+  statsEl.innerHTML = '';
+}
+
+let _perfHistoryCache = null;
+
+async function loadPicksHistory() {
+  if (_perfHistoryCache) return _perfHistoryCache;
+  try {
+    const res = await fetch('data/picks-history.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    _perfHistoryCache = await res.json();
+  } catch (err) {
+    console.error('Konnte picks-history.json nicht laden:', err);
+    _perfHistoryCache = [];
+  }
+  return _perfHistoryCache;
+}
+
+function formatPct(pct) {
+  if (pct === null || pct === undefined || isNaN(pct)) return 'n/a';
+  const sign = pct > 0 ? '+' : '';
+  return `${sign}${pct.toFixed(1)}%`;
+}
+
+function pctColor(pct) {
+  if (pct === null || pct === undefined || isNaN(pct)) return '#888';
+  return pct >= 0 ? '#10b981' : '#ef4444';
+}
+
+async function renderPerformanceTab() {
+  const history = await loadPicksHistory();
+  const tbody = document.getElementById('perfTableBody');
+  const tilesEl = document.getElementById('perfTiles');
+
+  if (!history || history.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#888;">
+      Noch keine Picks erfasst — die Historie füllt sich automatisch mit jedem täglichen Lauf.
+    </td></tr>`;
+    tilesEl.innerHTML = '';
+    return;
+  }
+
+  // Neueste zuerst
+  const sorted = [...history].sort((a, b) => b.date.localeCompare(a.date));
+
+  const rows = sorted.map(entry => {
+    const pick = entry.topPick || {};
+    const priceAtPick = typeof pick.priceAtPick === 'number' ? pick.priceAtPick : null;
+    const currentPrice = typeof pick.currentPrice === 'number' ? pick.currentPrice : null;
+    let pct = null;
+    if (priceAtPick && currentPrice) {
+      pct = ((currentPrice - priceAtPick) / priceAtPick) * 100;
+    }
+    return { ...entry, pick, priceAtPick, currentPrice, pct };
+  });
+
+  tbody.innerHTML = rows.map(r => `
+    <tr style="border-top:1px solid #eee;">
+      <td style="padding:10px;">${r.date}</td>
+      <td style="padding:10px;">${r.sector}</td>
+      <td style="padding:10px; font-weight:600;">${r.pick.ticker || '–'}</td>
+      <td style="padding:10px;">${r.pick.name || '–'}</td>
+      <td style="padding:10px; text-align:right;">${r.priceAtPick ? '$' + r.priceAtPick.toLocaleString('de-DE') : 'n/a'}</td>
+      <td style="padding:10px; text-align:right;">${r.currentPrice ? '$' + r.currentPrice.toLocaleString('de-DE') : 'n/a'}</td>
+      <td style="padding:10px; text-align:right; font-weight:600; color:${pctColor(r.pct)};">${formatPct(r.pct)}</td>
+    </tr>
+  `).join('');
+
+  const withPct = rows.filter(r => r.pct !== null);
+  let tilesHtml = '';
+  if (withPct.length > 0) {
+    const best = withPct.reduce((a, b) => (b.pct > a.pct ? b : a));
+    const worst = withPct.reduce((a, b) => (b.pct < a.pct ? b : a));
+    const avg = withPct.reduce((sum, r) => sum + r.pct, 0) / withPct.length;
+
+    tilesHtml = `
+      <div class="market-tile">
+        <div class="market-tile-label">Bester Pick</div>
+        <div class="market-tile-val">${best.pick.ticker}</div>
+        <div class="market-tile-sub" style="color:${pctColor(best.pct)};">${formatPct(best.pct)}</div>
+      </div>
+      <div class="market-tile">
+        <div class="market-tile-label">Schwächster Pick</div>
+        <div class="market-tile-val">${worst.pick.ticker}</div>
+        <div class="market-tile-sub" style="color:${pctColor(worst.pct)};">${formatPct(worst.pct)}</div>
+      </div>
+      <div class="market-tile">
+        <div class="market-tile-label">Ø Performance</div>
+        <div class="market-tile-val">${formatPct(avg)}</div>
+        <div class="market-tile-sub">über ${withPct.length} von ${rows.length} Picks</div>
+      </div>
+      <div class="market-tile">
+        <div class="market-tile-label">Picks gesamt</div>
+        <div class="market-tile-val">${rows.length}</div>
+        <div class="market-tile-sub">seit Start des Radars</div>
+      </div>
+    `;
+  } else {
+    tilesHtml = `
+      <div class="market-tile">
+        <div class="market-tile-label">Picks gesamt</div>
+        <div class="market-tile-val">${rows.length}</div>
+        <div class="market-tile-sub">Performance folgt nach dem ersten Kurs-Update</div>
+      </div>
+    `;
+  }
+  tilesEl.innerHTML = tilesHtml;
+}
+
+function renderWeeklyHero() {
+  const heroSection = document.getElementById('heroSection');
+  heroSection.className = 'hero';
+
+  document.getElementById('heroEyebrow').textContent = 'Wochenrückblick';
+  document.getElementById('heroTitle').innerHTML = 'Wie lief die<br/>Woche?';
+  document.getElementById('heroSub').textContent =
+    'Die fünf Top-Picks der aktuellen Woche im Überblick — mit Performance seit dem jeweiligen Pick-Tag.';
+
+  const navBadge = document.getElementById('navBadge');
+  if (navBadge) navBadge.textContent = 'Jeden Sonntag aktualisiert';
+
+  const statsEl = document.getElementById('heroStats');
+  statsEl.innerHTML = '';
+}
+
+let _weeklyHistoryCache = null;
+
+async function loadWeeklyHistory() {
+  if (_weeklyHistoryCache) return _weeklyHistoryCache;
+  try {
+    const res = await fetch('data/weekly-history.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    _weeklyHistoryCache = await res.json();
+  } catch (err) {
+    console.error('Konnte weekly-history.json nicht laden:', err);
+    _weeklyHistoryCache = [];
+  }
+  return _weeklyHistoryCache;
+}
+
+function renderWeeklyWeek(week) {
+  const desc = document.getElementById('weeklyDesc');
+  const tilesEl = document.getElementById('weeklyTiles');
+  const tableTitle = document.getElementById('weeklyTableTitle');
+  const tbody = document.getElementById('weeklyTableBody');
+
+  if (!week) {
+    desc.textContent = 'Noch keine Wochenrückblicke verfügbar — der erste folgt am kommenden Sonntag.';
+    tilesEl.innerHTML = '';
+    tableTitle.textContent = 'Picks der Woche';
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:#888;">
+      Noch keine Daten.
+    </td></tr>`;
+    return;
+  }
+
+  desc.textContent = `Woche vom ${week.dateRange || '–'}`;
+  tableTitle.textContent = `Picks der Woche (${week.dateRange || '–'})`;
+
+  const picks = week.picks || [];
+  tbody.innerHTML = picks.map(p => `
+    <tr style="border-top:1px solid #eee;">
+      <td style="padding:10px;">${p.day || '–'}</td>
+      <td style="padding:10px;">${p.sector || '–'}</td>
+      <td style="padding:10px; font-weight:600;">${p.ticker || '–'}</td>
+      <td style="padding:10px; text-align:right;">${p.priceAtPick ? '$' + p.priceAtPick.toLocaleString('de-DE') : 'n/a'}</td>
+      <td style="padding:10px; text-align:right;">${p.currentPrice ? '$' + p.currentPrice.toLocaleString('de-DE') : 'n/a'}</td>
+      <td style="padding:10px; text-align:right; font-weight:600; color:${pctColor(p.performancePct)};">${formatPct(p.performancePct)}</td>
+    </tr>
+  `).join('') || `<tr><td colspan="6" style="padding:20px; text-align:center; color:#888;">Keine Picks erfasst.</td></tr>`;
+
+  tilesEl.innerHTML = `
+    <div class="market-tile">
+      <div class="market-tile-label">Bester Pick</div>
+      <div class="market-tile-val">${week.bestPick?.ticker || '–'}</div>
+      <div class="market-tile-sub" style="color:${pctColor(week.bestPick?.performancePct)};">${formatPct(week.bestPick?.performancePct)}</div>
+    </div>
+    <div class="market-tile">
+      <div class="market-tile-label">Schwächster Pick</div>
+      <div class="market-tile-val">${week.worstPick?.ticker || '–'}</div>
+      <div class="market-tile-sub" style="color:${pctColor(week.worstPick?.performancePct)};">${formatPct(week.worstPick?.performancePct)}</div>
+    </div>
+    <div class="market-tile">
+      <div class="market-tile-label">Ø Performance</div>
+      <div class="market-tile-val">${formatPct(week.avgPerformancePct)}</div>
+      <div class="market-tile-sub">${picks.length} Picks ausgewertet</div>
+    </div>
+  `;
+}
+
+async function renderWeeklyTab() {
+  const history = await loadWeeklyHistory();
+
+  // Dropdown befüllen (alle außer der neuesten Woche, die ja schon oben prominent steht)
+  const select = document.getElementById('weeklyArchiveSelect');
+  select.innerHTML = '<option value="">– aktuelle Woche wird oben angezeigt –</option>';
+  if (history.length > 1) {
+    // Älteste zuerst im Dropdown weglassen der neuesten (Index history.length - 1)
+    for (let i = history.length - 2; i >= 0; i--) {
+      const w = history[i];
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = w.dateRange || `Woche ${i + 1}`;
+      select.appendChild(opt);
+    }
+  }
+
+  const latest = history.length > 0 ? history[history.length - 1] : null;
+  renderWeeklyWeek(latest);
+}
+
+async function renderWeeklyFromArchive(indexStr) {
+  if (indexStr === '') {
+    // Zurück zur aktuellen Woche
+    const history = await loadWeeklyHistory();
+    const latest = history.length > 0 ? history[history.length - 1] : null;
+    renderWeeklyWeek(latest);
+    return;
+  }
+  const history = await loadWeeklyHistory();
+  const idx = parseInt(indexStr, 10);
+  renderWeeklyWeek(history[idx]);
+}
+
+function renderWorkflowHero() {
+  const heroSection = document.getElementById('heroSection');
+  heroSection.className = 'hero hero-ai';
+
+  document.getElementById('heroEyebrow').textContent = 'Financial-Services-Plugin';
+  document.getElementById('heroTitle').innerHTML = 'So funktioniert die<br/>Aktienanalyse';
+  document.getElementById('heroSub').textContent =
+    'Eine Schritt-f\u00fcr-Schritt-Erkl\u00e4rung des Workflows \u2014 verst\u00e4ndlich f\u00fcr Einsteiger ohne Finanzwissen.';
+
+  const statsEl = document.getElementById('heroStats');
+  statsEl.innerHTML = `
+    <div class="hero-stat">
+      <div class="hero-stat-val">6</div>
+      <div class="hero-stat-label">Schritte bis zur Entscheidung</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">3</div>
+      <div class="hero-stat-label">Werkzeugk\u00e4sten</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">12</div>
+      <div class="hero-stat-label">Verf\u00fcgbare Skills</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">Einsteiger</div>
+      <div class="hero-stat-label">Keine Vorkenntnisse n\u00f6tig</div>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════
+   INITIAL RENDER
+   Wochenrückblick ist immer die feste Startseite (jeden Tag).
+═══════════════════════════════════════════════════════ */
+{
+  switchPage('weekly');
+}
+</script>
+
+</body>
+</html>
