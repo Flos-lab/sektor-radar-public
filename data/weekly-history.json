@@ -1,0 +1,12 @@
+[
+  {
+    "dateRange": "15.–20. Juni 2026",
+    "picks": [
+      { "day": "Do", "sector": "Finanzen", "ticker": "V", "priceAtPick": 295, "currentPrice": 327.24, "performancePct": 10.9 },
+      { "day": "Fr", "sector": "Health", "ticker": "LLY", "priceAtPick": 1098, "currentPrice": 1098.13, "performancePct": 0.0 }
+    ],
+    "bestPick": { "ticker": "V", "performancePct": 10.9 },
+    "worstPick": { "ticker": "LLY", "performancePct": 0.0 },
+    "avgPerformancePct": 5.5
+  }
+]

@@ -9,13 +9,7 @@
       "priceAtPick": 295,
       "currentPrice": 327
     },
-    "allFive": [
-      "BX",
-      "MA",
-      "MCO",
-      "SPGI",
-      "V"
-    ]
+    "allFive": ["BX", "MA", "MCO", "SPGI", "V"]
   },
   {
     "date": "2026-06-19",
@@ -25,15 +19,9 @@
       "name": "Eli Lilly",
       "reason": "Q1 2026 +56% Umsatzwachstum auf $19,8 Mrd., Mounjaro +125%, Foundayo (orales GLP-1) April 2026 FDA-zugelassen, 60% US-GLP-1-Marktanteil — stärkste Wachstumsstory unter Mega-Cap-Pharma ohne Risikoflags.",
       "priceAtPick": 1098,
-      "currentPrice": 1098
+      "currentPrice": 1131
     },
-    "allFive": [
-      "ABBV",
-      "ISRG",
-      "LLY",
-      "REGN",
-      "VRTX"
-    ]
+    "allFive": ["ABBV", "ISRG", "LLY", "REGN", "VRTX"]
   },
   {
     "date": "2026-06-22",
@@ -43,14 +31,19 @@
       "name": "Nvidia",
       "reason": "Q1 FY27 Rekord: $81,6 Mrd. Umsatz (+85% YoY), Data Center $75,2 Mrd. (+92%), Q2 FY27 Guidance $91 Mrd. Morningstar Fair Value $280 vs. aktuell $209 (+34%). CUDA-Moat seit 15 Jahren unangetastet — stärkster Burggraben im gesamten Tech-Sektor.",
       "priceAtPick": 209,
-      "currentPrice": 210
+      "currentPrice": 211
     },
-    "allFive": [
-      "NVDA",
-      "AVGO",
-      "MSFT",
-      "META",
-      "GOOGL"
-    ]
+    "allFive": ["NVDA", "AVGO", "MSFT", "META", "GOOGL"]
+  },
+  {
+    "date": "2026-06-23",
+    "sector": "Energie",
+    "topPick": {
+      "ticker": "VST",
+      "name": "Vistra",
+      "reason": "Höchstes Umsatzwachstum im Energie-Peer-Set (20% YoY), stärkstes AI-Power-Play: ERCOT-Markt in Texas profitiert direkt von explodirender Rechenzentrum-Stromnachfrage. 0 Risikoflags, 22% DCF-Upside (neues Ziel $200). Top Rule-of-40 (40) im Peer-Set.",
+      "priceAtPick": 164
+    },
+    "allFive": ["CEG", "COP", "EOG", "LNG", "VST"]
   }
 ]
