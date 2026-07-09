@@ -8,5 +8,31 @@
     "bestPick": { "ticker": "V", "performancePct": 10.9 },
     "worstPick": { "ticker": "LLY", "performancePct": 0.0 },
     "avgPerformancePct": 5.5
+  },
+  {
+    "dateRange": "22.–27. Juni 2026",
+    "picks": [
+      { "day": "Mo", "sector": "Tech", "ticker": "NVDA", "priceAtPick": 209, "currentPrice": 193.12, "performancePct": -7.6 },
+      { "day": "Di", "sector": "Energie", "ticker": "VST", "priceAtPick": 164, "currentPrice": 163.49, "performancePct": -0.3 },
+      { "day": "Mi", "sector": "Rohstoffe", "ticker": "NEM", "priceAtPick": 98, "currentPrice": 96.40, "performancePct": -1.6 },
+      { "day": "Fr", "sector": "Finanzen", "ticker": "MA", "priceAtPick": 493.99, "currentPrice": 499.02, "performancePct": 1.0 },
+      { "day": "Sa", "sector": "Health", "ticker": "LLY", "priceAtPick": 1128, "currentPrice": 1211.10, "performancePct": 7.4 }
+    ],
+    "bestPick": { "ticker": "LLY", "performancePct": 7.4 },
+    "worstPick": { "ticker": "NVDA", "performancePct": -7.6 },
+    "avgPerformancePct": -0.2
+  },
+  {
+    "dateRange": "29. Juni–4. Juli 2026",
+    "picks": [
+      { "day": "Mo", "sector": "Tech", "ticker": "TSM", "priceAtPick": 285, "currentPrice": 454.87, "performancePct": 59.6 },
+      { "day": "Di", "sector": "Energie", "ticker": "VST", "priceAtPick": 162.38, "currentPrice": 149.50, "performancePct": -7.9 },
+      { "day": "Mi", "sector": "Rohstoffe", "ticker": "NEM", "priceAtPick": 94.51, "currentPrice": 97.35, "performancePct": 3.0 },
+      { "day": "Do", "sector": "Finanzen", "ticker": "SPGI", "priceAtPick": 396.64, "currentPrice": 439.89, "performancePct": 10.9 },
+      { "day": "Sa", "sector": "Health", "ticker": "REGN", "priceAtPick": 654.27, "currentPrice": 654.27, "performancePct": 0.0 }
+    ],
+    "bestPick": { "ticker": "TSM", "performancePct": 59.6 },
+    "worstPick": { "ticker": "VST", "performancePct": -7.9 },
+    "avgPerformancePct": 13.1
   }
 ]
