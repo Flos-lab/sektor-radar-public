@@ -34,5 +34,18 @@
     "bestPick": { "ticker": "TSM", "performancePct": 59.6 },
     "worstPick": { "ticker": "VST", "performancePct": -7.9 },
     "avgPerformancePct": 13.1
+  },
+  {
+    "dateRange": "6.–11. Juli 2026",
+    "picks": [
+      { "day": "Di", "sector": "Tech", "ticker": "NVDA", "priceAtPick": 195.84, "currentPrice": 202.78, "performancePct": 3.5 },
+      { "day": "Mi", "sector": "Energie", "ticker": "CEG", "priceAtPick": 296.21, "currentPrice": 251.38, "performancePct": -15.1 },
+      { "day": "Do", "sector": "Rohstoffe", "ticker": "FCX", "priceAtPick": 68.39, "currentPrice": 61.53, "performancePct": -10.0 },
+      { "day": "Fr", "sector": "Finanzen", "ticker": "MA", "priceAtPick": 531.62, "currentPrice": 526.01, "performancePct": -1.1 },
+      { "day": "Sa", "sector": "Health", "ticker": "REGN", "priceAtPick": 664.52, "currentPrice": 667.95, "performancePct": 0.5 }
+    ],
+    "bestPick": { "ticker": "NVDA", "performancePct": 3.5 },
+    "worstPick": { "ticker": "CEG", "performancePct": -15.1 },
+    "avgPerformancePct": -4.4
   }
 ]
