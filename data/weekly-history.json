@@ -47,5 +47,15 @@
     "bestPick": { "ticker": "NVDA", "performancePct": 3.5 },
     "worstPick": { "ticker": "CEG", "performancePct": -15.1 },
     "avgPerformancePct": -4.4
+  },
+  {
+    "dateRange": "13.–18. Juli 2026",
+    "picks": [
+      { "day": "Mo", "sector": "Tech", "ticker": "AVGO", "priceAtPick": 399.97, "currentPrice": 369.99, "performancePct": -7.5 },
+      { "day": "Do", "sector": "Tech", "ticker": "NVDA", "priceAtPick": 212.50, "currentPrice": 202.55, "performancePct": -4.7 }
+    ],
+    "bestPick": { "ticker": "NVDA", "performancePct": -4.7 },
+    "worstPick": { "ticker": "AVGO", "performancePct": -7.5 },
+    "avgPerformancePct": -6.1
   }
 ]

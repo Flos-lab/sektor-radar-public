@@ -7,7 +7,7 @@
       "name": "Visa",
       "reason": "Höchste Rule of 40 (68%) im Peer-Set, 5/5-Burggraben durch globales Zahlungsnetzwerk mit 4,9 Mrd. Karten — strukturell unmöglich zu replizieren, keine Risikoflags.",
       "priceAtPick": 295,
-      "currentPrice": 348.97
+      "currentPrice": 355.33
     },
     "allFive": [
       "BX",
@@ -25,7 +25,7 @@
       "name": "Eli Lilly",
       "reason": "Q1 2026 +56% Umsatzwachstum auf $19,8 Mrd., Mounjaro +125%, Foundayo (orales GLP-1) April 2026 FDA-zugelassen, 60% US-GLP-1-Marktanteil — stärkste Wachstumsstory unter Mega-Cap-Pharma ohne Risikoflags.",
       "priceAtPick": 1098,
-      "currentPrice": 1188.58
+      "currentPrice": 1189.64
     },
     "allFive": [
       "ABBV",
@@ -43,7 +43,7 @@
       "name": "Nvidia",
       "reason": "Q1 FY27 Rekord: $81,6 Mrd. Umsatz (+85% YoY), Data Center $75,2 Mrd. (+92%), Q2 FY27 Guidance $91 Mrd. Morningstar Fair Value $280 vs. aktuell $209 (+34%). CUDA-Moat seit 15 Jahren unangetastet — stärkster Burggraben im gesamten Tech-Sektor.",
       "priceAtPick": 209,
-      "currentPrice": 210.57
+      "currentPrice": 208.00
     },
     "allFive": [
       "NVDA",
@@ -61,7 +61,7 @@
       "name": "Vistra",
       "reason": "Höchstes Umsatzwachstum im Energie-Peer-Set (20% YoY), stärkstes AI-Power-Play: ERCOT-Markt in Texas profitiert direkt von explodirender Rechenzentrum-Stromnachfrage. 0 Risikoflags, 22% DCF-Upside (neues Ziel $200). Top Rule-of-40 (40) im Peer-Set.",
       "priceAtPick": 164,
-      "currentPrice": 159.5
+      "currentPrice": 158.12
     },
     "allFive": [
       "CEG",
@@ -79,7 +79,7 @@
       "name": "Newmont",
       "reason": "Weltgrößter Goldproduzent mit Rekord-Q1 2026: $7,31 Mrd. Umsatz (+46% YoY), $3,1 Mrd. freier Cashflow in einem Quartal, $6 Mrd. Aktienrückkauf. Gold bei $4.900/oz — struktureller Rückenwind durch Inflationsschutz-Nachfrage und Zentralbankkäufe. Höchste Rule of 40 (57) im Peer-Set.",
       "priceAtPick": 98,
-      "currentPrice": 95.07
+      "currentPrice": 95.34
     },
     "allFive": [
       "ALB",
@@ -97,7 +97,7 @@
       "name": "Mastercard",
       "reason": "Höchster R40 (70) im Peer-Set, 54% FCF-Marge, 17% Umsatzwachstum und ~25% unter geschätztem Fair Value ($620 DCF-Ziel) — bestes All-round-Compounder-Profil mit zweiseitigem globalem Netzwerk-Burggraben ohne Risikoflags.",
       "priceAtPick": 493.99,
-      "currentPrice": 531.62
+      "currentPrice": 537.99
     },
     "allFive": [
       "ICE",
@@ -115,7 +115,7 @@
       "name": "Eli Lilly",
       "reason": "Top-Pick zwei Health-Läufe in Folge: Q1 2026 +56% YoY auf $19,8 Mrd., Foundayo (orales GLP-1) April 2026 FDA-zugelassen, 60% US-GLP-1-Marktanteil, Guidance $80–83 Mrd. — höchste Rule of 40 (69) und höchstes Wachstum im Peer-Set. 0 Risikoflags.",
       "priceAtPick": 1128,
-      "currentPrice": 1188.58
+      "currentPrice": 1189.64
     },
     "allFive": [
       "DXCM",
@@ -151,7 +151,7 @@
       "name": "Vistra",
       "reason": "Höchster Rule of 40 (40) unter flag-freien Kandidaten, 20% Umsatzwachstum, direktes Texas-AI-Power-Play im ERCOT-Markt. GEV (höchste Gesamtpunktzahl) wurde durch Insider-Selling-Flag ausgeschlossen. DCF-Ziel $200 → +23% Upside von $162. 0 Risikoflags.",
       "priceAtPick": 162.38,
-      "currentPrice": 159.5
+      "currentPrice": 158.12
     },
     "allFive": [
       "CEG",
@@ -169,7 +169,7 @@
       "name": "Newmont",
       "reason": "Q1 2026 Rekord: $7,31 Mrd. Umsatz (+46% YoY), $3,1 Mrd. FCF-Rekord in einem Quartal, EPS-Beat von $0,66. Trotz Gold-Korrektur von $5.589 auf ~$4.030/oz bleiben Zentralbanken Nettokäufer, Analystenkonsens $140 (+48% Upside). Höchster Rule of 40 (88) im Peer-Set, einzige Aktie mit 0 Risikoflags unter den Top-Kandidaten (ALB und FCX wegen je 2 Flags gestrichen).",
       "priceAtPick": 94.51,
-      "currentPrice": 95.07
+      "currentPrice": 95.34
     },
     "allFive": [
       "CF",
@@ -223,7 +223,7 @@
       "name": "Nvidia",
       "reason": "Einziger flag-freier Kandidat mit gleichzeitig dem stärksten Profil im Set: 85% Umsatzwachstum (höchstes im Peer-Set), 75% Bruttomarge, Rule of 40 >100, 5/5-Moat durch seit 15+ Jahren unangetasteten CUDA-Software-Lock-in. DCF-Ziel $250 (+27% ab $195,84). AVGO, TSM und ANET sind qualitativ stark, aber je 1 Flag (Insider-Verkäufe bzw. ITC-Patentverfahren); AMD ist flag-frei, aber deutlich schwächer bei Wachstum, Rule of 40 und Moat.",
       "priceAtPick": 195.84,
-      "currentPrice": 210.57
+      "currentPrice": 208.00
     },
     "allFive": [
       "AMD",
@@ -259,7 +259,7 @@
       "name": "Freeport-McMoRan",
       "reason": "Einziger flag-freier Top-Kandidat mit intakter Bewertungslage: SCCO ist ebenfalls 0-Flag, aber das eigenständige DCF zeigt dort eine Überbewertung von -41% (Kurs bereits bei ~18x EBITDA statt historischer 8-10x-Norm für Großminen). CF Industries hat das beste DCF-Aufwärts-Profil (+21%), trägt aber einen Insider-Verkaufs-Flag; ebenso Albemarle (DCF -34%, 1 Flag) und Nucor (1 Flag). FCX bietet sauberen, direkten Zugang zur stärksten Sektor-These (KI-getriebene Kupfernachfrage) über Grasberg, eine der größten Kupfer-Gold-Lagerstätten der Welt, bei moderatem Analystenkonsens-Aufschlag (+5,2%) und breiter Street-Unterstützung (17 von 23 Strong Buy). 0 Risikoflags.",
       "priceAtPick": 68.39,
-      "currentPrice": 61.53
+      "currentPrice": 61.49
     },
     "allFive": [
       "ALB",
@@ -277,7 +277,7 @@
       "name": "Mastercard",
       "reason": "Höchster Rule of 40 (68) im Peer-Set bei 100% Bruttomarge und 16% Wachstum — beste All-Round-Kombination aus Wachstum, Qualität, fairer Bewertung (14,7x EV/Revenue) und 5/5-Burggraben. Der $38-Mrd.-Swipe-Fee-Vergleich erhielt am 10. Juni 2026 vorläufige richterliche Genehmigung, was das größte Rechtsrisiko entschärft. KKR (39% Wachstum, günstigste Bewertung 5,1x EV/Revenue) und MSCI sind ebenfalls stark, aber KKR trägt 1 Flag (Sammelklage gegen verbundene FS KKR Capital Corp) und MSCI ist mit 16,0x EV/Revenue die teuerste Bewertung im Set. Visa (1 Flag: laufende DOJ-Kartellklage) und S&P Global (1 Flag: Analysten-Herabstufung wegen KI-Disruptionsrisiko) wurden als Top-Pick wegen ihrer Risikoflags übersprungen. 0 Risikoflags.",
       "priceAtPick": 531.62,
-      "currentPrice": 531.62
+      "currentPrice": 537.99
     },
     "allFive": [
       "KKR",
@@ -312,13 +312,32 @@
       "ticker": "AVGO",
       "name": "Broadcom",
       "reason": "Alle 5 finalen Tech-Kandidaten (AVGO, MU, PLTR, ANET, AMD) tragen je 1 Risikoflag (primaer Insider-Verkaeufe, kein flag-freier Titel verfuegbar). AVGO ist unter ihnen fundamental am staerksten: hoechstes Rule of 40 (94), hoechster Moat (5/5), und als einziger der drei Top-3-DCF-Titel eine annaehernd faire Bewertung (+2,6% DCF-Basisszenario, Fair Value $410,56 bei Kurs $399,97) - waehrend MU (-54,2%) und PLTR (-62,7%) selbst im Basisszenario deutliche Ueberbewertung zeigen. Analystenkonsensziel $517 (+29%). 1 Risikohinweis: Insider-Verkaeufe des Chairman.",
-      "priceAtPick": 399.97
+      "priceAtPick": 399.97,
+      "currentPrice": 399.97
     },
     "allFive": [
       "AMD",
       "ANET",
       "AVGO",
       "MU",
+      "PLTR"
+    ]
+  },
+  {
+    "date": "2026-07-16",
+    "sector": "Tech",
+    "topPick": {
+      "ticker": "NVDA",
+      "name": "Nvidia",
+      "reason": "Einziger flag-freier Kandidat unter den finalen 5 (PLTR, AVGO, ANET je 1 Insider-Verkaufs-Flag; MU mit mehreren Flags: Rekord-Insider-Verkaeufe, Michael-Burry-Short-These, CXMT-Konkurrenzdruck). Staerkstes Gesamtprofil: 85% Umsatzwachstum (Q1 FY27, $81,6 Mrd., Data Center +92%), Rule of 40 ~130, hoechster Moat (5/5) durch seit 15+ Jahren unangetasteten CUDA-Software-Lock-in. Eigenes DCF-Modell zeigt intakte Sicherheitsmarge: +17,6% Upside im Base Case ($250 Ziel bei Kurs $212,50), Analystenkonsensziel $301,62.",
+      "priceAtPick": 212.50,
+      "currentPrice": 212.50
+    },
+    "allFive": [
+      "ANET",
+      "AVGO",
+      "MU",
+      "NVDA",
       "PLTR"
     ]
   }
