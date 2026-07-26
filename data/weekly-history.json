@@ -57,5 +57,16 @@
     "bestPick": { "ticker": "NVDA", "performancePct": -4.7 },
     "worstPick": { "ticker": "AVGO", "performancePct": -7.5 },
     "avgPerformancePct": -6.1
+  },
+  {
+    "dateRange": "20.–25. Juli 2026",
+    "picks": [
+      { "day": "Mi", "sector": "Tech", "ticker": "TSM", "priceAtPick": 397.80, "currentPrice": 421.21, "performancePct": 5.9 },
+      { "day": "Fr", "sector": "Energie", "ticker": "CEG", "priceAtPick": 275.60, "currentPrice": 275.43, "performancePct": -0.1 },
+      { "day": "Sa", "sector": "Health", "ticker": "REGN", "priceAtPick": 662.00, "currentPrice": 656.34, "performancePct": -0.9 }
+    ],
+    "bestPick": { "ticker": "TSM", "performancePct": 5.9 },
+    "worstPick": { "ticker": "REGN", "performancePct": -0.9 },
+    "avgPerformancePct": 1.6
   }
 ]

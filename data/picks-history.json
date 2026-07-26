@@ -375,5 +375,22 @@
       "BWXT",
       "OKE"
     ]
+  },
+  {
+    "date": "2026-07-25",
+    "sector": "Health",
+    "topPick": {
+      "ticker": "REGN",
+      "name": "Regeneron",
+      "reason": "Base-Case-DCF zeigt +44,6% Upside bei nur -19,0% Bear-Case-Risiko (bestes Chance/Risiko-Verhältnis im Set) und mit Abstand der günstigsten Bewertung (~4,0x EV/Revenue) bei intaktem 19% Umsatzwachstum und Dupixent +31% YoY.",
+      "priceAtPick": 662.0
+    },
+    "allFive": [
+      "ALNY",
+      "ISRG",
+      "LLY",
+      "REGN",
+      "VEEV"
+    ]
   }
 ]
