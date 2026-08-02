@@ -68,5 +68,16 @@
     "bestPick": { "ticker": "TSM", "performancePct": 5.9 },
     "worstPick": { "ticker": "REGN", "performancePct": -0.9 },
     "avgPerformancePct": 1.6
+  },
+  {
+    "dateRange": "27. Juli–1. August 2026",
+    "picks": [
+      { "day": "Mi", "sector": "Finanzen", "ticker": "KKR", "priceAtPick": 97.01, "currentPrice": 101.43, "performancePct": 4.6 },
+      { "day": "Do", "sector": "Health", "ticker": "REGN", "priceAtPick": 696.9, "currentPrice": 738.34, "performancePct": 5.9 },
+      { "day": "Fr", "sector": "Tech", "ticker": "NVDA", "priceAtPick": 201.65, "currentPrice": 198.98, "performancePct": -1.3 }
+    ],
+    "bestPick": { "ticker": "REGN", "performancePct": 5.9 },
+    "worstPick": { "ticker": "NVDA", "performancePct": -1.3 },
+    "avgPerformancePct": 3.1
   }
 ]
